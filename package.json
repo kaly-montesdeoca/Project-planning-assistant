@@ -11,11 +11,14 @@
   },
   "dependencies": {
     "@tauri-apps/api": "^2",
+    "@tauri-apps/plugin-fs": "^2.0.2",
     "@tauri-apps/plugin-shell": "^2",
+    "pinia": "^2.2.8",
     "vue": "^3.3.4",
     "vuetify": "^3.7.4"
   },
   "devDependencies": {
+    "@mdi/font": "^7.4.47",
     "@tauri-apps/cli": "^2",
     "@vitejs/plugin-vue": "^5.0.5",
     "typescript": "^5.2.2",
