@@ -1,7 +1,15 @@
-<template>
-
+<template>  
+  <div>
+    <notes />
+  </div>
+  <div class="position-absolute bottom-0 right-0 pb-2">
+    <action-bar />
+  </div> 
 </template>
 <script setup lang="ts">
+
+  import ActionBar from "./components/ActionBar.vue";
+  import Notes from "./components/Notes.vue";
 
 </script>
 
