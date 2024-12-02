@@ -84,8 +84,19 @@
         someStore.deleteProjectMetadata(project);
     }
 
-    function loadProject (project:Project){
-        
+    async function loadProject (project:Project){
+        const directoryName = Helper.GetProyectDirectory(project.name);
+        const tokenExists = await exists(directoryName + '/annotation.json', { baseDir: BaseDirectory.AppLocalData });
+        if (tokenExists) {
+            const annotationFile = await readTextFile(directoryName + '/annotation.json', {
+                baseDir: BaseDirectory.AppLocalData,
+            });
+                       
+            someStore.loadAnnotationProjec(JSON.parse(annotationFile));
+            isOpenDialogMenu.value = false;
+        } else {
+            console.error("ERROR! Al cargar el proyecto.");
+        }
     }
 
     function open() {

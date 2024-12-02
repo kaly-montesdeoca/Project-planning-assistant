@@ -3,8 +3,8 @@ import { NoteData, LevelData, Project } from './item.model';
 
 interface State {
     appName: String;
-    projectsBaseDir: String | '';
-    proyectLevels: LevelData[];
+    ldProjectsBaseDir: String | '';
+    ldProyectLevels: LevelData[];
     projects: Project[];
   }
 
@@ -12,12 +12,20 @@ export const useMainStore = defineStore('main', {
     state: (): State => {
         return {
             appName: 'ProjectPlanningAssistant',
-            projectsBaseDir: '',
-            proyectLevels: [] as LevelData[],
+            ldProjectsBaseDir: '',
+            ldProyectLevels: [] as LevelData[],
             projects: [] as Project[],
         }
-      },
+      },      
       actions: {
+        loadAnnotationProjec(data: LevelData[]) {   
+          this.ldProyectLevels = [];
+          data.forEach(element => {
+            let newLevel:LevelData = {levelNumber:element.levelNumber, noteList:element.noteList}
+            this.ldProyectLevels.push(newLevel);
+          });
+        },
+
         saveProjectMetadataArray(metadata: string[]) {
           metadata.forEach(element => {
             this.saveProjectMetadata(element);
