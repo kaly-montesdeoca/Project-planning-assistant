@@ -7,9 +7,10 @@
 </template>
 
 <script setup lang="ts">
+    const emit = defineEmits(['oMenu'])
 
-    function openMenu () {
-            console.log("Btn OpenMenu funcion");
+    function openMenu () {            
+        emit('oMenu', '');
     };
     function openSearch () {
             console.log("Btn OpenSearch funcion");

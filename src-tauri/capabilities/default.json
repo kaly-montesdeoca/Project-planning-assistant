@@ -8,6 +8,15 @@
   "permissions": [
     "core:default",
     "shell:allow-open",
-    "fs:default"
+    "fs:default",
+    "fs:allow-app-read-recursive",
+    "fs:allow-write-text-file",
+    "fs:allow-create",
+    "fs:allow-write",
+    "fs:allow-remove",
+    {
+      "identifier": "fs:allow-exists",
+      "allow": [{ "path": "$APPDATA/*" }]
+    }
   ]
 }
