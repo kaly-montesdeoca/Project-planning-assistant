@@ -1,18 +1,10 @@
-<template> 
-<div class="h-screen">
-    <v-row class="mt-8">
-        <note :note-name="msg" :annotationList="arr" />
-    </v-row>    
-</div>
+<template>    
+    <notes/>
 </template>
 <script setup lang="ts">  
 
-    import Note from "./Note.vue";
-    import { useMainStore } from '../store/mainStore';
-
-    const store = useMainStore();
-    const notes = store.actualLevel
-
+    import Notes from "./Notes.vue";
+  
     const msg = 'Titulo de la tarjeta!'
     const arr = [] as String[];
     arr[0] = "Primer valor de position-static bg-blue rounded-lg pa-3 d-inline \

@@ -1,10 +1,14 @@
 import { defineStore } from 'pinia';
-import { NoteData, LevelData, Project } from './item.model';
+import { LevelData, Project, FileStringList } from './item.model';
+import Helper from '../Helper';
 
 interface State {
     appName: String;
     ldProjectsBaseDir: String | '';
-    ldProyectLevels: LevelData[];
+    actualProjectLvls: LevelData[];
+    actualConfigProject: Project;
+    actualLevel: LevelData;
+    actualNotesCount: number;
     projects: Project[];
   }
 
@@ -13,30 +17,42 @@ export const useMainStore = defineStore('main', {
         return {
             appName: 'ProjectPlanningAssistant',
             ldProjectsBaseDir: '',
-            ldProyectLevels: [] as LevelData[],
+            actualProjectLvls: [] as LevelData[],
             projects: [] as Project[],
+            actualConfigProject: {} as Project,
+            actualLevel: {} as LevelData,
+            actualNotesCount: 0,
         }
       },      
       actions: {
-        loadAnnotationProjec(data: LevelData[]) {   
-          this.ldProyectLevels = [];
-          data.forEach(element => {
-            let newLevel:LevelData = {levelNumber:element.levelNumber, noteList:element.noteList}
-            this.ldProyectLevels.push(newLevel);
-          });
+        newLevelCreated(emptyAnn:LevelData, newLevlNumber:number) {
+          //actualizar config con el nuevo nivel
+          //generar los hijos de cada nota
+          //actualizar ldProyectLevel
+          this.actualConfigProject.totalLevels = newLevlNumber;
+          Helper.updateConfigFile(this.actualConfigProject);
+          this.actualProjectLvls.push(emptyAnn);
+
+        },
+
+        loadLevlProjec(levels: LevelData[]) {   
+          this.actualProjectLvls =levels; 
+          this.actualLevel = this.actualProjectLvls[0];
         },
 
         saveProjectMetadataArray(metadata: string[]) {
           metadata.forEach(element => {
             this.saveProjectMetadata(element);
-          });
+          });          
         },
 
         saveProjectMetadata(metadata: string) {
-            const metaProjec = metadata.split(/\r?\n/);
+            const metaProjec = metadata.split(/\r?\n/);      
             const name = this.getDataFromConfigLine(metaProjec[0]);
             const cDate = this.getDataFromConfigLine(metaProjec[1]);
-            this.projects.push({name: name, createDate: cDate});
+            const totalLvl = parseInt(this.getDataFromConfigLine(metaProjec[2]));
+      
+            this.projects.push({name: name, createDate: cDate, totalLevels: totalLvl});
         },
         
         deleteProjectMetadata(project:Project) {
@@ -45,7 +61,16 @@ export const useMainStore = defineStore('main', {
         },
 
         getDataFromConfigLine(data:String) :string {
-          return data.substring(1, data.length-1);
+          return data.substring(1, data.length-1);          
         },
+
+        getNewNoteId() {
+          this.actualNotesCount +=1;
+          return this.actualNotesCount;
+        },
+      },
+
+      getters: {
+        lastLevel: (state) => (state.actualProjectLvls.length == 0) ? 0 : state.actualProjectLvls[state.actualProjectLvls.length-1].levelNumber,
       },
   })

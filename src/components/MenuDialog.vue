@@ -1,6 +1,6 @@
 <template>    
     <v-dialog v-model="isOpenDialogMenu">
-        <div class="bg-white ">
+        <div class="bg-white">
             <h2 class="text-center">Proyectos</h2>
             <v-divider />        
             <v-data-table :headers="header" :sort-by="[{ key: 'nombre', order: 'asc' }]" :items="projects">
@@ -37,7 +37,7 @@
                     </template>
                     <template v-slot:actions>
                         <v-spacer></v-spacer>
-                        <v-btn class="mb-2" color="primary" dark @click="NewProject"> Aceptar</v-btn>
+                        <v-btn class="mb-2" color="primary" dark @click="newProject"> Aceptar</v-btn>
                         <v-btn class="mb-2" color="primary" dark @click="CancelNewProject">Cancelar</v-btn>                        
                     </template> 
                 </v-card>
@@ -48,7 +48,7 @@
 
 <script setup lang="ts">  
     import { useMainStore } from '../store/mainStore';
-    import { remove, create, mkdir, readTextFile, BaseDirectory, exists } from '@tauri-apps/plugin-fs';
+    import { remove, readTextFile, BaseDirectory, exists } from '@tauri-apps/plugin-fs';
     import { ref } from 'vue';
     import Helper from '../Helper';
     import { Project, NoteData, LevelData } from '../store/item.model';
@@ -66,9 +66,72 @@
                     {title: ' ', sortable: false, key: 'actions'}];   
     let projects = useMainStore().projects;
 
-    function format(date:String) {        
-        const date2 = new Date(date.toString());
-        return date2.toLocaleDateString();
+    //FUNCIONES
+
+    async function loadProject (project:Project){
+        const directoryName = Helper.GetProyectDirectory(project.name);
+        const levels: LevelData[] = [];
+        for (let i = 0; i < project.totalLevels; i++){
+            const tokenExists = await exists(directoryName + '/level' + i + '.json', { baseDir: BaseDirectory.AppLocalData });
+            const tokenExists2 = await exists(directoryName + '/annot' + i + '.json', { baseDir: BaseDirectory.AppLocalData });
+            if (!tokenExists || !tokenExists2) {
+                console.error("ERROR! Al cargar el proyecto.");
+                return;
+            }
+            const levlFile = await readTextFile(directoryName + '/level' + i + '.json', { baseDir: BaseDirectory.AppLocalData });
+            const annotationFile = await readTextFile(directoryName + '/annot' + i + '.json', { baseDir: BaseDirectory.AppLocalData });
+
+            levels.push(Helper.mergeLvlNotesWithAnnotations(levlFile, annotationFile));
+        }
+        someStore.loadLevlProjec(levels);
+        isOpenDialogMenu.value = false;
+        someStore.actualConfigProject = project;        
+    }
+
+    async function newProject() {
+        console.log("Creando nuevo proyecto"); 
+        const directoryName = Helper.GetProyectDirectory(newProjectName);       
+        let directory =  await Helper.createDirectory(Helper.baseDirectory, Helper.GetStringWithoutSpaces(newProjectName));
+        if (!directory) {
+            return;
+        }
+
+        const configDir = Helper.GetConfigDir(newProjectName);
+        let configFile = await Helper.createFile(directoryName, 'config.txt', '['+ newProjectName +']\r\n['+ new Date() +']\r\n[1]');
+        if (!configFile){
+            return;
+        }
+
+        let emptyAnn = Helper.generateLvlAnnotationEmty();
+        let note:NoteData = {id: 0, parentId: 0, name:newProjectName, levelNumber:0, annotationList: [], dirImageList: []};
+        emptyAnn.noteList.push(note);
+        let annotation = await Helper.createFile(directoryName, 'level0.json', JSON.stringify(emptyAnn));
+        if (!annotation) {
+            return;
+        }
+        
+        let annotlvl = await Helper.createFile(directoryName, 'annot0.json', '');
+        if (!annotlvl) {
+            return;
+        }
+
+        let imageDirectory = await Helper.createDirectory(directoryName+'/', 'images');
+        if (!imageDirectory){
+            return;
+        }
+
+        //Se crearon todos los ficheros
+        console.log("Se creo el proyecto correctamente.");
+        updateStore(configDir);
+        isOpenDialogNew.value = false;
+        newProjectName = '';
+    }
+
+    async function updateStore(configDir:string) {
+        const configProjectfile = await readTextFile(configDir, {
+          baseDir: BaseDirectory.AppLocalData,
+        });
+        someStore.saveProjectMetadata(configProjectfile);
     }
 
     async function deleteProject (project:Project){
@@ -84,108 +147,18 @@
         someStore.deleteProjectMetadata(project);
     }
 
-    async function loadProject (project:Project){
-        const directoryName = Helper.GetProyectDirectory(project.name);
-        const tokenExists = await exists(directoryName + '/annotation.json', { baseDir: BaseDirectory.AppLocalData });
-        if (tokenExists) {
-            const annotationFile = await readTextFile(directoryName + '/annotation.json', {
-                baseDir: BaseDirectory.AppLocalData,
-            });
-                       
-            someStore.loadAnnotationProjec(JSON.parse(annotationFile));
-            isOpenDialogMenu.value = false;
-        } else {
-            console.error("ERROR! Al cargar el proyecto.");
-        }
-    }
-
+    //Formularios
     function open() {
         isOpenDialogMenu.value = !isOpenDialogMenu.value;
     }
 
+    function format(date:String) {        
+        const date2 = new Date(date.toString());
+        return date2.toLocaleDateString();
+    }
+    
     function CancelNewProject() {
         newProjectName = '';
         isOpenDialogNew.value = false;
-    }
-
-    function generateAnnotationEmty(name:string) {
-        const emptyAnn: NoteData = {  id: 0,
-                                    parentId: 0,
-                                    name: name,
-                                    levelNumber: 0,
-                                    annotationList: [],
-                                    dirImageList: [] };
-        const arrayAnn = [emptyAnn];
-        const emptyLevel: LevelData = {
-            levelNumber: 0,
-            noteList: arrayAnn
-        };
-
-        return [emptyLevel];
-    }
-    async function NewProject() {
-        console.log("Creando nuevo proyecto")
-        //Crear la carpeta y el archivo config
-        
-        const directoryName = Helper.GetProyectDirectory(newProjectName);       
-        let directory =  await createDirectory(Helper.baseDirectory, Helper.GetStringWithoutSpaces(newProjectName));
-
-        if (directory) {
-            const configDir = Helper.GetConfigDir(newProjectName);
-            //let configFile = await createConfigFile(configDir);
-            let configFile = await createFile(directoryName, 'config.txt', '['+ newProjectName +']\r\n['+ new Date() +']');
-
-            if (configFile) {
-                let emptyAnn = generateAnnotationEmty(newProjectName);
-                let annotation = await createFile(directoryName, 'annotation.json', JSON.stringify(emptyAnn)); //Aca file
-                if (annotation) {
-                    let imageDirectory = await createDirectory(directoryName+'/', 'images');
-                    if (imageDirectory) {
-                        console.log("Se creo el proyecto correctamente.");
-                        //Para agregar mas archivos, continuar desde aca 
-                        //Este updateStore va siempre al final de todo
-                        updateStore(configDir);
-                    } 
-                }
-            } else {
-                console.error("Ocurrio un error inesperado");
-            }
-        }
-        isOpenDialogNew.value = false;
-        newProjectName = '';
-    }
-
-    async function createFile(directoryName:string, fileName:string, data:string) {
-        const completePath = directoryName +'/' + fileName;
-        const file = await create(completePath, { baseDir: BaseDirectory.AppLocalData });
-        await file.write(new TextEncoder().encode(data));
-        await file.close();
-        const tokenExists = await exists(completePath, { baseDir: BaseDirectory.AppLocalData });
-        if(!tokenExists) {
-            console.error("ERROR! Ocurrio un error al intentar crear el archivo: " + fileName + '.');
-            return false;
-        }
-        return true;
-    }
-
-    async function createDirectory(directory:string, folderName:string) {
-        let tokenExists = await exists(directory + folderName, { baseDir: BaseDirectory.AppLocalData });
-        if (tokenExists) {
-            console.error("ERROR! Ocurrio un error al intentar crear la carpeta:" + folderName + ".");
-            return false;
-        }
-        await mkdir(directory + folderName, { baseDir: BaseDirectory.AppLocalData });
-        tokenExists = await exists(directory + folderName, { baseDir: BaseDirectory.AppLocalData });
-        if (!tokenExists) {
-            console.error("ERROR! Ocurrio un error al intentar crear la carpeta:" + folderName + ".");
-        }
-        return true;
-    }
-
-    async function updateStore(configDir:string) {
-        const configProjectfile = await readTextFile(configDir, {
-          baseDir: BaseDirectory.AppLocalData,
-        });
-        someStore.saveProjectMetadata(configProjectfile);
     }
 </script>

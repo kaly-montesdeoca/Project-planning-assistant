@@ -1,19 +1,24 @@
 export interface NoteData {
-    id: Number;
-    parentId: Number;
+    id: number;
+    parentId: number;
     name: string;
-    levelNumber: Number;
+    levelNumber: number;
     annotationList: string[];
     dirImageList: string[];    
 }
 
 export interface LevelData {
-    levelNumber: Number;
+    levelNumber: number;
     noteList: NoteData[];
 }
 
 export interface Project {
-    name: String;
-    //projectDir: String;
-    createDate: String;
+    name: string;    
+    createDate: string;
+    totalLevels: number;
+}
+
+export interface FileStringList {
+    ownerId: number;
+    stringList: string[];
 }

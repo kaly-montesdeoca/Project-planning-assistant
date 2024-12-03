@@ -1,5 +1,5 @@
 <template>
-    <v-card variant="outlined" elevation="16" :title="noteName" class="text-center ma-4 ">
+    <v-card variant="outlined" elevation="16" :title="noteName" class="text-center ma-4 bg-white">
         <v-divider />
         <v-card-text class="text-left">
             <v-row v-for="(item, i) in annotationList" :key="`sub-group-${i}`">
