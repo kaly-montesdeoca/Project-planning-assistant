@@ -12,13 +12,25 @@ export interface LevelData {
     noteList: NoteData[];
 }
 
+//info en archivo config
 export interface Project {
     name: string;    
     createDate: string;
     totalLevels: number;
 }
 
+//Para levantar el listado de 'tareas'
 export interface FileStringList {
     ownerId: number;
     stringList: string[];
+}
+
+//relacion entre padre e indice del slider
+export interface ParentChildIndex {
+    parentId: number;
+    childIndex: number;
+}
+
+export interface ParentChildIndexArray {
+    parentChildIndexArr: ParentChildIndex[];
 }

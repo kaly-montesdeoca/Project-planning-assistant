@@ -1,6 +1,6 @@
 <template>  
     <v-row class="position-absolute top-0 pt-3">    
-        <v-card width="350" class="pt-2">
+        <v-card width="550" class="pt-2">
             <template v-slot:text>
                 <v-row>
                     <h2>{{ lvlTitle() }}</h2>  
@@ -19,7 +19,22 @@
                         <template v-slot:activator="{ props }">
                             <v-btn size="x-small" icon="mdi-chevron-double-down" class="mx-1" :disabled="childExist()" v-bind="props" @click="goToChild"></v-btn>
                         </template>               
-                    </v-tooltip>                    
+                    </v-tooltip>  
+                    <v-spacer></v-spacer>
+                    <v-divider vertical></v-divider>    
+                    <v-spacer></v-spacer>
+                    <h2>{{ parentName() }}</h2>  
+                    <v-spacer></v-spacer>
+                    <v-tooltip text="Ir a siguiente">
+                        <template v-slot:activator="{ props }">
+                            <v-btn size="x-small" icon="mdi-chevron-double-left" class="mx-1" :disabled="parentExist()" v-bind="props" @click="goToParent"></v-btn>
+                        </template>               
+                    </v-tooltip>
+                    <v-tooltip text="Ir a anterior">
+                        <template v-slot:activator="{ props }">
+                            <v-btn size="x-small" icon="mdi-chevron-double-right" class="mx-1" :disabled="childExist()" v-bind="props" @click="goToChild"></v-btn>
+                        </template>               
+                    </v-tooltip> 
                 </v-row>            
             </template>        
         </v-card>
@@ -31,13 +46,23 @@
     import { useMainStore } from '../store/mainStore';
     import { LevelData, NoteData } from '../store/item.model';
 
-   const store = useMainStore();
+    const store = useMainStore();
 
-   function lvlTitle ()  {
-    return 'Nivel actual: ' + store.actualLevel.levelNumber;
-   }
+    function lvlTitle ()  {
+        return 'Nivel actual: ' + store.actualLevel.levelNumber;
+    }
 
-   function goToParent () {
+    function parentName() {
+        const lvl = store.actualLevel.levelNumber;
+        if (lvl === 0) {
+            return store.actualConfigProject.name;
+        } else if (lvl === 1) {
+            return store.actualLevel.noteList[0].name;
+        }
+        return 'NonNe';
+    }
+
+    function goToParent () {
         const parentNumber = store.actualLevel.levelNumber -1;
         store.goToLevel(parentNumber);
             console.log("Btn goToParent funcion");

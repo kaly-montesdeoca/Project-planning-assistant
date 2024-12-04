@@ -90,4 +90,12 @@ export default class Helper {
         }
         return true;
     }
+
+    static printArray(array:[]) {
+        let result ='[';
+        array.forEach((key, value) => {
+            result += key + ' :' + value.toString() + ', ';
+        })
+        result += ']';
+    }
 }

@@ -1,5 +1,5 @@
 <template>
-    <v-container class="bg-green" fluid >
+    <v-container class="bg-green h-screen" fluid >
         <v-row v-if="projecLoaded()" >
             <v-col>
                 <v-row  class="d-flex justify-center bg-green">
