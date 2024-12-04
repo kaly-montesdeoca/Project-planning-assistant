@@ -3,13 +3,13 @@ import { LevelData, Project, FileStringList } from './item.model';
 import Helper from '../Helper';
 
 interface State {
-    appName: String;
-    ldProjectsBaseDir: String | '';
+    appName: string;
+    ldProjectsBaseDir: string | '';
     actualProjectLvls: LevelData[];
     actualConfigProject: Project;
     actualLevel: LevelData;
     actualNotesCount: number;
-    projects: Project[];
+    projects: Project[];    
   }
 
 export const useMainStore = defineStore('main', {
@@ -21,7 +21,7 @@ export const useMainStore = defineStore('main', {
             projects: [] as Project[],
             actualConfigProject: {} as Project,
             actualLevel: {} as LevelData,
-            actualNotesCount: 0,
+            actualNotesCount: 0,           
         }
       },      
       actions: {
@@ -35,9 +35,17 @@ export const useMainStore = defineStore('main', {
 
         },
 
-        loadLevlProjec(levels: LevelData[]) {   
-          this.actualProjectLvls =levels; 
+        //Carga todos los niveles de un proyecto 
+        loadLevlProjec(levels: LevelData[]) {    
+          this.actualProjectLvls = levels; 
           this.actualLevel = this.actualProjectLvls[0];
+        },
+
+        goToLevel(level:number) {
+          if (level >= 0 && level <this.actualProjectLvls.length) {
+            this.actualLevel = this.actualProjectLvls[level];
+            
+          }
         },
 
         saveProjectMetadataArray(metadata: string[]) {
@@ -71,6 +79,6 @@ export const useMainStore = defineStore('main', {
       },
 
       getters: {
-        lastLevel: (state) => (state.actualProjectLvls.length == 0) ? 0 : state.actualProjectLvls[state.actualProjectLvls.length-1].levelNumber,
+        lastLevel: (state) => (state.actualProjectLvls.length == 0) ? 0 : state.actualProjectLvls[state.actualProjectLvls.length-1].levelNumber,        
       },
   })

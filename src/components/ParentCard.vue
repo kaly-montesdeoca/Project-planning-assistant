@@ -1,22 +1,35 @@
 <template>  
-    <v-row class="position-absolute top-0">    
-        <v-card width="350" >
+    <v-row class="position-absolute top-0 pt-3">    
+        <v-card width="350" class="pt-2">
             <template v-slot:text>
                 <v-row>
                     <h2>{{ lvlTitle() }}</h2>  
                     <v-spacer></v-spacer>
-                    <v-btn size="x-small" icon="mdi-plus" class="mx-1" @click="addLvl"></v-btn> 
-                    <v-btn size="x-small" icon="mdi-chevron-double-up" class="mx-1" @click="goToParent"></v-btn>
-                    <v-btn size="x-small" icon="mdi-chevron-double-down" class="mx-1" @click="goToChild"></v-btn>
+                    <v-tooltip text="Añadir nivel">
+                        <template v-slot:activator="{ props }">
+                            <v-btn size="x-small" icon="mdi-plus" class="mx-1" color="success" :disabled="!childExist()" v-bind="props" @click="addLvl"></v-btn> 
+                        </template>
+                    </v-tooltip>
+                    <v-tooltip text="Ir a nivel superior">
+                        <template v-slot:activator="{ props }">
+                            <v-btn size="x-small" icon="mdi-chevron-double-up" class="mx-1" :disabled="parentExist()" v-bind="props" @click="goToParent"></v-btn>
+                        </template>               
+                    </v-tooltip>
+                    <v-tooltip text="Ir a nivel inferior">
+                        <template v-slot:activator="{ props }">
+                            <v-btn size="x-small" icon="mdi-chevron-double-down" class="mx-1" :disabled="childExist()" v-bind="props" @click="goToChild"></v-btn>
+                        </template>               
+                    </v-tooltip>                    
                 </v-row>            
             </template>        
         </v-card>
     </v-row>
 </template>
+
 <script setup lang="ts">  
     import Helper from '../Helper';
     import { useMainStore } from '../store/mainStore';
-    import { LevelData, FileStringList, NoteData } from '../store/item.model';
+    import { LevelData, NoteData } from '../store/item.model';
 
    const store = useMainStore();
 
@@ -25,18 +38,30 @@
    }
 
    function goToParent () {
+        const parentNumber = store.actualLevel.levelNumber -1;
+        store.goToLevel(parentNumber);
             console.log("Btn goToParent funcion");
     };
     function goToChild () {
+        const childNumber = store.actualLevel.levelNumber +1;
+        store.goToLevel(childNumber);
             console.log("Btn goToChild funcion");
     };
+
+    function parentExist() {        
+        return (store.actualLevel.levelNumber === 0);
+    }
+
+    function childExist() {
+        return (store.actualLevel.levelNumber === store.actualProjectLvls.length-1);
+    }
 
     async function addLvl() {     
         //Necesito listado de todos los nodos del nivel actual
         // a cada nodo hay que generarle un hijo
 
         const nodosActuales = store.actualLevel.noteList;
-        const newLevlNumber =  (store.lastLevel +1); 
+        const newLevlNumber =  (store.actualConfigProject.totalLevels); 
         let newNodes = [] as NoteData[];
         nodosActuales.forEach(e => {
             const newNote: NoteData = {id:store.getNewNoteId(), parentId: e.id, name:'son of ' + e.name, 
@@ -46,10 +71,9 @@
 
         let emptyAnn = Helper.generateLvlAnnotationEmty();
         emptyAnn.noteList = newNodes;
-        //const emptyAnnlvl = [Helper.generateAnnotationEmty()];
 
         if (await createNecesaryFiles(emptyAnn, newLevlNumber)) {
-            store.newLevelCreated(emptyAnn, newLevlNumber);
+            store.newLevelCreated(emptyAnn, newLevlNumber+1);
         }
     }
 

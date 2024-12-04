@@ -71,6 +71,7 @@
     async function loadProject (project:Project){
         const directoryName = Helper.GetProyectDirectory(project.name);
         const levels: LevelData[] = [];
+        let notesCount = 0;
         for (let i = 0; i < project.totalLevels; i++){
             const tokenExists = await exists(directoryName + '/level' + i + '.json', { baseDir: BaseDirectory.AppLocalData });
             const tokenExists2 = await exists(directoryName + '/annot' + i + '.json', { baseDir: BaseDirectory.AppLocalData });
@@ -82,7 +83,9 @@
             const annotationFile = await readTextFile(directoryName + '/annot' + i + '.json', { baseDir: BaseDirectory.AppLocalData });
 
             levels.push(Helper.mergeLvlNotesWithAnnotations(levlFile, annotationFile));
+            notesCount += levels[i].noteList.length;
         }
+        someStore.actualNotesCount = notesCount;
         someStore.loadLevlProjec(levels);
         isOpenDialogMenu.value = false;
         someStore.actualConfigProject = project;        

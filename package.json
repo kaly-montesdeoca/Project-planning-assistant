@@ -10,6 +10,7 @@
     "tauri": "tauri"
   },
   "dependencies": {
+    "@egjs/vue3-flicking": "^4.11.4",
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-fs": "^2.0.2",
     "@tauri-apps/plugin-shell": "^2",

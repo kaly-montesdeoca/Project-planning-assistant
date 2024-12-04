@@ -1,5 +1,5 @@
 <template>
-    <v-card variant="outlined" elevation="16" :title="noteName" class="text-center ma-4 bg-white">
+    <v-card variant="outlined" elevation="16" :title="noteName" class="text-center ma-4 bg-white" width="500">
         <v-divider />
         <v-card-text class="text-left">
             <v-row v-for="(item, i) in annotationList" :key="`sub-group-${i}`">
@@ -20,7 +20,7 @@
                         <v-img :width="162" aspect-ratio="1/1" class="ma-2"
                             src="https://cdn.vuetifyjs.com/images/parallax/material.jpg" />
                         <!--<img src="image.jpeg">-->
-                </v-slide-group-item>
+                    </v-slide-group-item>
                 </v-slide-group>
             </v-row>
         </v-card-text>
