@@ -10,8 +10,7 @@ interface State {
     notesCount: number;   
     parentSliderIndexArr: ParentChildIndex[][];
     displayedSliderIndexArray: ParentChildIndex[];
-    displayedSliderIndex: number;
-    nextSliderIndex: number;
+    sliderIndex: number;
     displayesParentName: string;
   }
 
@@ -24,26 +23,27 @@ interface State {
           notesCount: 0,  
           parentSliderIndexArr: [],
           displayedSliderIndexArray: [],
-          displayedSliderIndex: 0,
-          nextSliderIndex: 0,
+          sliderIndex: 0,
           displayesParentName: 'INICIO',
       }
     },
 
     actions: {
-      getBrotherIndexArray(direction:number):number {
-        const lvlF = this.displayedLevel.levelNumber -1;
-        const idF = this.displayedParent.id;
-        const myIndex = this.getIDIndexNotes(this.allLvls[lvlF].noteList, idF);
-          
-        const maxIndex = this.allLvls[this.displayedLevel.levelNumber-1].noteList.length;
-        const result = myIndex + direction; 
-        if (result === -1) {
-          return maxIndex -1;
-        } else if (result >= maxIndex) {
-          return 0;
-        }
-        return result;
+      generateNewLevel():LevelData {
+        //Generamso todas las notas que va a tenr el nuevo nivel
+        const nodosActuales = this.displayedLevel.noteList;
+        const newLvlnumber = this.allLvls.length;
+        let newLvlNotes = [] as NoteData[];
+        nodosActuales.forEach(e => {
+          const newNote: NoteData = this.generateNote(this.getNewNoteID(), e.id, 'From: ' + e.name);
+          newLvlNotes.push(newNote);
+        });
+        return {levelNumber:newLvlnumber, noteList:newLvlNotes} as LevelData;
+      },
+
+      addNewLevel(newLevel:LevelData) {
+        console.log("crea")
+        this.allLvls.push(newLevel);
       },
 
       addNewNote(newNoteName:string) {
@@ -130,7 +130,7 @@ interface State {
       },
 
       changeDisplaySliderIndex(newIndex:number):void {
-        this.displayedSliderIndex = newIndex;
+        this.sliderIndex = newIndex;
 
         if (this.displayedLevel.levelNumber-2 >= 0) {
           const parentId = Helper.binarySearchParentID(newIndex, this.parentSliderIndexArr[this.displayedLevel.levelNumber-2]);
@@ -150,15 +150,32 @@ interface State {
         }
       },
 
-      changeNextSliderIndex(index:number, nextParent:number, lvl:number):void {
-        this.nextSliderIndex = index;
+      changeNextSliderIndex(index:number, nextParent:number, lvl:number):void {  
+        this.sliderIndex = index;
         if (lvl-1 === 0) {
           this.displayedParent = this.allLvls[0].noteList[0];
         } else {         
           //let index = this.getIDIndexNotes(this.allLvls[lvl-1].noteList, nextParent)//this.allLvls[lvl-1].noteList.findIndex(n => {n.id === nextParent})
-          //console.log("Indice 1:" + index + "lvl: " + lvl);
+          console.log("Indice 1: " + index + " lvl: " + lvl + ' nextParent: ' + nextParent);
           this.displayedParent = this.allLvls[lvl-1].noteList[nextParent];
-        }         
+        }     
+        this.updateParentName();    
+      },
+
+      getBrotherIndexArray(direction:number):number {
+        const lvlF = this.displayedLevel.levelNumber -1;
+        const idF = this.displayedParent.id;
+        const myIndex = this.getIDIndexNotes(this.allLvls[lvlF].noteList, idF);
+          
+        const maxIndex = this.allLvls[this.displayedLevel.levelNumber-1].noteList.length;
+        const result = myIndex + direction; 
+        console.log("lvlF: " + lvlF + "idF: " + idF + " myIndex: " + myIndex + " maxIndex: " +maxIndex +" result:" +result);
+        if (result === -1) {
+          return maxIndex -1;
+        } else if (result >= maxIndex) {
+          return 0;
+        }
+        return result;
       },
 
       sumChildConcurrency(level:number, parentId:number) :void {

@@ -31,6 +31,11 @@ export interface ParentChildIndex {
     childIndexSup: number;
 }
 
+export interface FileNeedSave {
+    prefix: string;
+    fileNumber: number;
+    needSave: boolean;
+}
 /*export interface ParentChildIndexArray {
     parentChildIndexArr: ParentChildIndex[];
 }*/

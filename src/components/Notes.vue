@@ -2,12 +2,10 @@
 <div class="">   
     <v-row class="mt-16">
         <v-col>    
-        <flicking :options="{ align: 'center', circular: true, moveType: 'freeScroll' }" @changed="cambioPibe" ref="flickingComp">
-            
-                <note v-for="(note, n) in displayedLevel.noteList" :note-name="note.name" :annotationList="note.annotationList" :key="n"/>
-           
-        </flicking> 
-        <!--<v-btn @click="scrollFlick">boton</v-btn>-->
+            <flicking :options="{ align: 'center', circular: true, moveType: 'freeScroll' }" @changed="indexChanged" ref="flickingComp">            
+                <note v-for="(note, n) in displayedLevel.noteList" :note-name="note.name" :annotationList="note.annotationList" :key="n"/>           
+            </flicking> 
+            <!--<v-btn @click="scrollFlick">boton</v-btn>-->
         </v-col>
     </v-row>    
 </div>
@@ -26,14 +24,15 @@
     const flickingComp = ref();
 
 
-    function cambioPibe() {
+    function indexChanged() {
         lvlStore.changeDisplaySliderIndex(flickingComp.value.index);        
     }
 
     watch(
-    () => lvlStore.nextSliderIndex,
+    () => lvlStore.sliderIndex,
     () => {
-        flickingComp.value.moveTo(lvlStore.nextSliderIndex);
+        console.log("muevo: " + lvlStore.sliderIndex);
+        flickingComp.value.moveTo(lvlStore.sliderIndex);
     }
 )
 </script>

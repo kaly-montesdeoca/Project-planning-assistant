@@ -5,11 +5,8 @@ import Helper from '../Helper';
 
 interface State {
     appName: string;
-    ldProjectsBaseDir: string | '';
-    
+    ldProjectsBaseDir: string | '';    
     actualConfigProject: Project;
-    
-    
     projects: Project[];
 
   }
@@ -20,8 +17,7 @@ export const useMainStore = defineStore('main', {
             appName: 'ProjectPlanningAssistant',
             ldProjectsBaseDir: '',            
             projects: [] as Project[],
-            actualConfigProject: {} as Project,
-            
+            actualConfigProject: {} as Project,            
         }
       },      
       actions: {       
@@ -50,20 +46,30 @@ export const useMainStore = defineStore('main', {
           return data.substring(1, data.length-1);          
         },
 
-        //Borrar
+        async createNewLevelNecesaryFiles(newLvl:LevelData, newLevlNumber:number) {
+          const directoryName = Helper.GetProyectDirectory(this.actualConfigProject.name); 
 
-        newNote(note:NoteData, position:number) {
-          //this.actualLevel.noteList.splice(position, 0, note);
+          let level = await Helper.createFile(directoryName, 'level' + newLevlNumber +'.json', JSON.stringify(newLvl));
+          if (!level) {     
+              console.error("ERROR! Fallo al crear fichero")       
+              return false;
+          }
+
+          let annotlvl = await Helper.createFile(directoryName, 'annot' + newLevlNumber +'.json', '');
+          if (!annotlvl) {
+              console.error("ERROR! Fallo al crear fichero")     
+              return false;
+          }
+
+          console.log("Exito!");
+          return true;
         },
 
-        newLevelCreated(emptyAnn:LevelData, newLevlNumber:number) {
-          //actualizar config con el nuevo nivel
-          //generar los hijos de cada nota
-          //actualizar ldProyectLevel
+        updateConfigFile(newLevlNumber:number) {
+          //actualizar config con el nuevo nivel 
           this.actualConfigProject.totalLevels = newLevlNumber;
           Helper.updateConfigFile(this.actualConfigProject);
           //this.actualProjectLvls.push(emptyAnn);
-
         },
       },
 
