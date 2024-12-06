@@ -1,8 +1,7 @@
 export interface NoteData {
     id: number;
     parentId: number;
-    name: string;
-    levelNumber: number;
+    name: string;    
     annotationList: string[];
     dirImageList: string[];    
 }
@@ -28,9 +27,10 @@ export interface FileStringList {
 //relacion entre padre e indice del slider
 export interface ParentChildIndex {
     parentId: number;
-    childIndex: number;
+    childIndexInf: number;
+    childIndexSup: number;
 }
 
-export interface ParentChildIndexArray {
+/*export interface ParentChildIndexArray {
     parentChildIndexArr: ParentChildIndex[];
-}
+}*/

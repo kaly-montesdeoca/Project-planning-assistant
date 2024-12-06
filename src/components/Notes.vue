@@ -2,12 +2,12 @@
 <div class="">   
     <v-row class="mt-16">
         <v-col>    
-        <flicking :options="{ align: 'center', circular: true, moveType: 'freeScroll' }" @changed="cambioPibe" ref="isOpenDialogNew">
+        <flicking :options="{ align: 'center', circular: true, moveType: 'freeScroll' }" @changed="cambioPibe" ref="flickingComp">
             
-                <note v-for="(note, n) in actualLevel.noteList" :note-name="note.name" :annotationList="note.annotationList" :key="n"/>
+                <note v-for="(note, n) in displayedLevel.noteList" :note-name="note.name" :annotationList="note.annotationList" :key="n"/>
            
         </flicking> 
-        <!--<v-btn @click="btn">boton</v-btn>-->
+        <!--<v-btn @click="scrollFlick">boton</v-btn>-->
         </v-col>
     </v-row>    
 </div>
@@ -15,19 +15,27 @@
 <script setup lang="ts">  
     import Note from "./Note.vue";
     import { useMainStore } from '../store/mainStore';
+    import { useLevelStore } from '../store/loadedLvl';
     import { storeToRefs } from 'pinia'
-    import { ref } from "vue";
+    import { ref, watch } from "vue";
+
     const store = useMainStore();
-    const { actualLevel } = storeToRefs(store)  
-    let isOpenDialogNew = ref();
-    let booleanvar = true;
-    function btn() {
-        isOpenDialogNew.value = !isOpenDialogNew.value  ;
-    }
+    const lvlStore = useLevelStore();
+
+    const { displayedLevel } = storeToRefs(lvlStore)  
+    const flickingComp = ref();
+
+
     function cambioPibe() {
-        console.log(isOpenDialogNew.value.index)
-        
+        lvlStore.changeDisplaySliderIndex(flickingComp.value.index);        
     }
+
+    watch(
+    () => lvlStore.nextSliderIndex,
+    () => {
+        flickingComp.value.moveTo(lvlStore.nextSliderIndex);
+    }
+)
 </script>
 <!--
 esto es para que se pueda arrastrar y tmb hacer click (cuando es link)

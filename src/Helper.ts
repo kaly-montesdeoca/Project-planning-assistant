@@ -1,4 +1,4 @@
-import { LevelData, FileStringList, Project } from "./store/item.model";
+import { LevelData, FileStringList, Project, ParentChildIndex } from "./store/item.model";
 import { create, mkdir, BaseDirectory, exists } from '@tauri-apps/plugin-fs';
 
 export default class Helper {
@@ -89,6 +89,56 @@ export default class Helper {
             console.error("ERROR! Ocurrio un error al intentar crear la carpeta:" + folderName + ".");
         }
         return true;
+    }
+
+    static binarySearchParentID(value:number, list:ParentChildIndex[]) {
+        let first = 0;    //left endpoint 
+        let last = list.length - 1;   //right endpoint 
+        let result = -1;
+        let found = false;
+        let middle:number;
+        while (found === false && first <= last) {
+            middle = Math.floor((first + last)/2);
+            if (list[middle].childIndexInf <= value && list[middle].childIndexSup >= value) {
+                found = true;
+                result = list[middle].parentId;
+            } else if (list[middle].childIndexInf > value) {  //if in lower half 
+                last = middle - 1;
+            } else {  //in in upper half 
+                first = middle + 1;
+            }
+        }
+        return result;
+    }
+
+    static binarySearchIndexByChildIndex(value:number, list:ParentChildIndex[]) {
+        let first = 0;    //left endpoint 
+        let last = list.length - 1;   //right endpoint 
+        let result = -1;
+        let found = false;
+        let middle:number;
+        while (found === false && first <= last) {
+            middle = Math.floor((first + last)/2);
+            if (list[middle].childIndexInf <= value && list[middle].childIndexSup >= value) {
+                found = true;
+                result = middle;
+            } else if (list[middle].childIndexInf > value) {  //if in lower half 
+                last = middle - 1;
+            } else {  //in in upper half 
+                first = middle + 1;
+            }
+        }
+        return result;
+    }
+
+    static SearchIndexByParentId(value:number, list:ParentChildIndex[]) {
+        for (let i = 0; i < list.length; i++){
+            if (list[i].parentId === value) {
+                return i;
+            }
+        }
+        console.error("ERROR! No encontro ParentId: " + value);
+        return 0;
     }
 
     static printArray(array:[]) {

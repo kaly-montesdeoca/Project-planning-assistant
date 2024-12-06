@@ -48,6 +48,7 @@
 
 <script setup lang="ts">  
     import { useMainStore } from '../store/mainStore';
+    import { useLevelStore } from '../store/loadedLvl';
     import { remove, readTextFile, BaseDirectory, exists } from '@tauri-apps/plugin-fs';
     import { ref } from 'vue';
     import Helper from '../Helper';
@@ -58,6 +59,7 @@
     });
 
     const someStore = useMainStore();
+    const lvlStore = useLevelStore();
     let newProjectName = '';
     let isOpenDialogNew = ref(false);
     let isOpenDialogMenu = ref(false);
@@ -85,8 +87,8 @@
             levels.push(Helper.mergeLvlNotesWithAnnotations(levlFile, annotationFile));
             notesCount += levels[i].noteList.length;
         }
-        someStore.actualNotesCount = notesCount;
-        someStore.loadLevlProjec(levels);
+        lvlStore.notesCount = notesCount;
+        lvlStore.loadProject(levels);
         isOpenDialogMenu.value = false;
         someStore.actualConfigProject = project;        
     }
@@ -106,7 +108,7 @@
         }
 
         let emptyAnn = Helper.generateLvlAnnotationEmty();
-        let note:NoteData = {id: 0, parentId: 0, name:newProjectName, levelNumber:0, annotationList: [], dirImageList: []};
+        let note:NoteData = {id: 0, parentId: 0, name:newProjectName, annotationList: [], dirImageList: []};
         emptyAnn.noteList.push(note);
         let annotation = await Helper.createFile(directoryName, 'level0.json', JSON.stringify(emptyAnn));
         if (!annotation) {

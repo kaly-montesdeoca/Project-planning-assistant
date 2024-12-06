@@ -1,7 +1,7 @@
 <template>
     <v-tooltip text="Nueva nota">
         <template v-slot:activator="{ props }">        
-            <v-btn icon="mdi-plus" class="mx-2" @click="openAddNote" v-bind="props"></v-btn>
+            <v-btn icon="mdi-plus" class="mx-2" @click="openAddNote" v-bind="props" :disabled="esRaiz()"></v-btn>
         </template>               
     </v-tooltip>
 
@@ -21,7 +21,11 @@
 </template>
 
 <script setup lang="ts">
-    const emit = defineEmits(['oMenu'])
+    import { useMainStore } from '../store/mainStore';
+    import { useLevelStore } from '../store/loadedLvl';
+
+    const lvlStore = useLevelStore();
+    const emit = defineEmits(['oMenu', 'oNewNote'])
 
     function openMenu () {            
         emit('oMenu', '');
@@ -30,8 +34,12 @@
             console.log("Btn OpenSearch funcion");
     };
     function openAddNote () {
-            console.log("Btn OpenAddNote funcion");
+        emit('oNewNote', '');
     };
+
+    function esRaiz() {
+        return lvlStore.displayedLevel.levelNumber === 0;
+    }
     /*
     function goToParent () {
             console.log("Btn goToParent funcion");

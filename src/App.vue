@@ -7,7 +7,7 @@
                 </v-row>
                 <v-row>
                     <v-col>
-                        <level />
+                        <notes />
                     </v-col>
                 </v-row>
             </v-col>
@@ -17,8 +17,9 @@
             <h1>No hay proyecto seleccionado</h1>
         </v-row>
         <div class="position-absolute bottom-0 right-0 pb-2">
-            <action-bar @oMenu="openMenuDialog()"/>
+            <action-bar @oMenu="openMenuDialog()" @oNewNote="openNewNoteDialog()"/>
             <menu-dialog ref="menuDialog" />
+            <new-note-dialog ref="newNOteDialog" />
         </div> 
     </v-container> 
 </template>
@@ -28,17 +29,25 @@
     import ActionBar from "./components/ActionBar.vue";
     import MenuDialog from "./components/MenuDialog.vue";
     import ParentCard from './components/ParentCard.vue';
-    import Level from './components/Level.vue';
+    import NewNoteDialog from './components/NewNoteDialog.vue';
+    import Notes from "./components/Notes.vue";  
     import { readDir, readTextFile, BaseDirectory, exists } from '@tauri-apps/plugin-fs';
     import { useMainStore } from './store/mainStore'; 
+    import { useLevelStore } from './store/loadedLvl';
     import Helper from './Helper';
-    import TestSliderGroup from './components/TestSliderGroup.vue';
+
+    const lvlStore = useLevelStore();
     const someStore = useMainStore();
     const menuDialog = ref();
+    const newNOteDialog = ref();
 
     function openMenuDialog() {
         menuDialog.value.open();
     };
+
+    function openNewNoteDialog() {
+        newNOteDialog.value.open();
+    }
 
     async function loadData() {
         const entries = await readDir('ProjectsFiles', { baseDir: BaseDirectory.AppLocalData });
@@ -58,7 +67,7 @@
     }
 
     function projecLoaded() {
-        return Object.keys(someStore.actualLevel).length !== 0;
+        return Object.keys(lvlStore.displayedLevel).length !== 0;
     }
     
     onMounted(() => {

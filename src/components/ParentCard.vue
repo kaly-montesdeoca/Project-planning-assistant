@@ -25,14 +25,14 @@
                     <v-spacer></v-spacer>
                     <h2>{{ parentName() }}</h2>  
                     <v-spacer></v-spacer>
-                    <v-tooltip text="Ir a siguiente">
+                    <v-tooltip text="Ir al anterior">
                         <template v-slot:activator="{ props }">
-                            <v-btn size="x-small" icon="mdi-chevron-double-left" class="mx-1" :disabled="parentExist()" v-bind="props" @click="goToParent"></v-btn>
+                            <v-btn size="x-small" icon="mdi-chevron-double-left" class="mx-1" :disabled="brotherExist()" v-bind="props" @click="goToNextBrother(-1)"></v-btn>
                         </template>               
                     </v-tooltip>
-                    <v-tooltip text="Ir a anterior">
+                    <v-tooltip text="Ir al siguiente">
                         <template v-slot:activator="{ props }">
-                            <v-btn size="x-small" icon="mdi-chevron-double-right" class="mx-1" :disabled="childExist()" v-bind="props" @click="goToChild"></v-btn>
+                            <v-btn size="x-small" icon="mdi-chevron-double-right" class="mx-1" :disabled="brotherExist()" v-bind="props" @click="goToNextBrother(1)"></v-btn>
                         </template>               
                     </v-tooltip> 
                 </v-row>            
@@ -44,53 +44,70 @@
 <script setup lang="ts">  
     import Helper from '../Helper';
     import { useMainStore } from '../store/mainStore';
+    import { useLevelStore } from '../store/loadedLvl';
     import { LevelData, NoteData } from '../store/item.model';
 
     const store = useMainStore();
+    const lvlStore = useLevelStore();
 
     function lvlTitle ()  {
-        return 'Nivel actual: ' + store.actualLevel.levelNumber;
+        return 'Nivel actual: ' + lvlStore.displayedLevel.levelNumber;
     }
 
     function parentName() {
-        const lvl = store.actualLevel.levelNumber;
+        /*const lvl = lvlStore.displayedLevel.levelNumber;
         if (lvl === 0) {
-            return store.actualConfigProject.name;
+            return "INICIO";
         } else if (lvl === 1) {
-            return store.actualLevel.noteList[0].name;
+            return store.actualConfigProject.name;
         }
-        return 'NonNe';
+        const parentId = Helper.binarySearchParentID(lvlStore.displayedSliderIndex, lvlStore.parentSliderIndexArr[lvl-2]);        
+        return lvlStore.getParentNameWithLvl((lvl-1), parentId);*/
+        return lvlStore.displayesParentName;
     }
 
     function goToParent () {
-        const parentNumber = store.actualLevel.levelNumber -1;
-        store.goToLevel(parentNumber);
-            console.log("Btn goToParent funcion");
+        const parentNumber = lvlStore.displayedLevel.levelNumber -1;
+        lvlStore.goToLevel(parentNumber);            
     };
     function goToChild () {
-        const childNumber = store.actualLevel.levelNumber +1;
-        store.goToLevel(childNumber);
-            console.log("Btn goToChild funcion");
+        const childNumber = lvlStore.displayedLevel.levelNumber +1;
+        lvlStore.goToLevel(childNumber);
     };
 
+    function goToNextBrother(direction:number) {
+        const lvl = lvlStore.displayedLevel.levelNumber;        
+        const nextBrotherIndex = lvlStore.getBrotherIndexArray(direction);
+        lvlStore.changeNextSliderIndex(lvlStore.parentSliderIndexArr[lvl-2][nextBrotherIndex].childIndexInf, nextBrotherIndex, lvl);     
+    }
+
+    function brotherExist() {
+        if (lvlStore.displayedLevel.levelNumber === 0 || lvlStore.displayedLevel.levelNumber === 1) {
+            return true;
+        }
+        if (lvlStore.allLvls[lvlStore.displayedLevel.levelNumber -1].noteList.length > 1) {
+            return false;
+        }
+    }
+
     function parentExist() {        
-        return (store.actualLevel.levelNumber === 0);
+        return (lvlStore.displayedLevel.levelNumber === 0);
     }
 
     function childExist() {
-        return (store.actualLevel.levelNumber === store.actualProjectLvls.length-1);
+        return (lvlStore.displayedLevel.levelNumber === lvlStore.allLvls.length-1);
     }
 
     async function addLvl() {     
         //Necesito listado de todos los nodos del nivel actual
         // a cada nodo hay que generarle un hijo
 
-        const nodosActuales = store.actualLevel.noteList;
+        const nodosActuales = lvlStore.displayedLevel.noteList;
         const newLevlNumber =  (store.actualConfigProject.totalLevels); 
         let newNodes = [] as NoteData[];
         nodosActuales.forEach(e => {
-            const newNote: NoteData = {id:store.getNewNoteId(), parentId: e.id, name:'son of ' + e.name, 
-                                        levelNumber: newLevlNumber, annotationList: [], dirImageList: []};
+            const newNote: NoteData = {id: lvlStore.getNewNoteID(), parentId: e.id, name:'son of ' + e.name, 
+                                         annotationList: [], dirImageList: []};
             newNodes.push(newNote);
         });
 
@@ -118,6 +135,5 @@
         }
         console.log("Exito!");
         return true;
-    }
-   
+    }   
 </script>
