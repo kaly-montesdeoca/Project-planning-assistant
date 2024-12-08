@@ -1,13 +1,16 @@
+
+
 export interface NoteData {
     id: number;
     parentId: number;
-    name: string;    
+    name: string;    //30 max
     annotationList: string[];
     dirImageList: string[];    
 }
 
 export interface LevelData {
     levelNumber: number;
+    fragmented: boolean; //Borrar
     noteList: NoteData[];
 }
 
@@ -39,3 +42,12 @@ export interface FileNeedSave {
 /*export interface ParentChildIndexArray {
     parentChildIndexArr: ParentChildIndex[];
 }*/
+
+export const Particionado = 10;
+
+export enum NotifType {
+    info = "info",
+    success = "success",
+    warning = "warning",
+    error= "error",
+  }

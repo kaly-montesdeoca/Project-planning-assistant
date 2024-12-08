@@ -14,9 +14,10 @@
     "fs:allow-create",
     "fs:allow-write",
     "fs:allow-remove",
-    {
-      "identifier": "fs:allow-exists",
-      "allow": [{ "path": "$APPDATA/*" }]
-    }
+    "fs:allow-exists",
+    "sql:default",
+    "sql:allow-execute"
+
   ]
 }
+

@@ -47,18 +47,20 @@
 </template>
 
 <script setup lang="ts">  
+    import { ref } from 'vue';
     import { useMainStore } from '../store/mainStore';
     import { useLevelStore } from '../store/loadedLvl';
+    import Helper from '../Helpers/Helper';
+    import FilesHelper from '../Helpers/FilesHelper';
+    import { Project, NoteData, LevelData, NotifType } from '../store/item.model';
     import { remove, readTextFile, BaseDirectory, exists } from '@tauri-apps/plugin-fs';
-    import { ref } from 'vue';
-    import Helper from '../Helper';
-    import { Project, NoteData, LevelData } from '../store/item.model';
+
 
     defineExpose({
         open,
     });
 
-    const someStore = useMainStore();
+    const mainStore = useMainStore();
     const lvlStore = useLevelStore();
     let newProjectName = '';
     let isOpenDialogNew = ref(false);
@@ -71,7 +73,7 @@
     //FUNCIONES
 
     async function loadProject (project:Project){
-        const directoryName = Helper.GetProyectDirectory(project.name);
+        /*const directoryName = FilesHelper.getProyectDirectory(project.name);
         const levels: LevelData[] = [];
         let notesCount = 0;
         for (let i = 0; i < project.totalLevels; i++){
@@ -90,44 +92,94 @@
         lvlStore.notesCount = notesCount;
         lvlStore.loadProject(levels);
         isOpenDialogMenu.value = false;
-        someStore.actualConfigProject = project;        
+        someStore.actualConfigProject = project; */ 
+        //------------------------------------------------------
+        const directoryName = FilesHelper.getProyectDirectory(project.name);
+        let notesCount = 0;
+        const levels: LevelData[] = [];
+        
+        for (let i = 0; i < project.totalLevels; i++){
+            const tokenExists = await exists(directoryName + '/data' + i + '.json', { baseDir: BaseDirectory.AppLocalData });
+            if (!tokenExists) { mainStore.notify("Error al cargar el proyecto.", NotifType.error); return; }
+            const levlFile = await readTextFile(directoryName + '/data' + i + '.json', { baseDir: BaseDirectory.AppLocalData });
+            const levelObj:LevelData = JSON.parse(levlFile);
+            if (levelObj.fragmented) {
+                const moreNotes = await getPartitions(directoryName + '/data' + i);
+                levelObj.noteList.concat(moreNotes);
+            }
+            notesCount += levelObj.noteList.length;
+            levels.push(levelObj);
+        }
+
+        lvlStore.notesCount = notesCount;
+        lvlStore.loadProject(levels);
+        isOpenDialogMenu.value = false;
+        mainStore.actualConfigProject = project;
+    }
+
+    async function getPartitions(directoryAndPartialName:string) {
+        let finish = false;
+        let part = 1;
+        let notes:NoteData[] = [] as NoteData[];
+        while (!finish) {
+            const tokenExists = await exists(directoryAndPartialName + 'part' + part +'.json', { baseDir: BaseDirectory.AppLocalData });
+            if (tokenExists) {
+                const notestxt = await readTextFile(directoryAndPartialName + 'part' + part +'.json', { baseDir: BaseDirectory.AppLocalData });
+                notes.push(JSON.parse(notestxt));
+            } else {
+                finish = false;
+            }
+        }
+        return notes;
     }
 
     async function newProject() {
         console.log("Creando nuevo proyecto"); 
-        const directoryName = Helper.GetProyectDirectory(newProjectName);       
+        
+        //Primero creamos el directorio del nuevo proyecto
+
+        /*const directoryName = Helper.GetProyectDirectory(newProjectName);       
         let directory =  await Helper.createDirectory(Helper.baseDirectory, Helper.GetStringWithoutSpaces(newProjectName));
         if (!directory) {
             return;
-        }
+        }*/
+        const directory = await FilesHelper.createNewProeyctFolder(newProjectName);
+        if (!directory) { return; }
 
-        const configDir = Helper.GetConfigDir(newProjectName);
+        /*const configDir = Helper.GetConfigDir(newProjectName);
         let configFile = await Helper.createFile(directoryName, 'config.txt', '['+ newProjectName +']\r\n['+ new Date() +']\r\n[1]');
         if (!configFile){
             return;
-        }
+        }*/
+        const configFile = await FilesHelper.createConfigFile(newProjectName);
+        if (!configFile) { return; }
 
-        let emptyAnn = Helper.generateLvlAnnotationEmty();
+        /*let imageDirectory = await Helper.createDirectory(directoryName+'/', 'images');
+        if (!imageDirectory){
+            return;
+        }*/
+
+        const imageDirectory = await FilesHelper.createDirectory(FilesHelper.getStringWithoutSpaces(newProjectName) +'/', 'images');
+        if (!imageDirectory){ return; }
+
+        /*let emptyAnn = Helper.generateLvlAnnotationEmty();
         let note:NoteData = {id: 0, parentId: 0, name:newProjectName, annotationList: [], dirImageList: []};
         emptyAnn.noteList.push(note);
         let annotation = await Helper.createFile(directoryName, 'level0.json', JSON.stringify(emptyAnn));
         if (!annotation) {
             return;
-        }
+        }*/
+        const dataFile = await FilesHelper.createDataFile(newProjectName);
+        if (!dataFile){ return; }
         
-        let annotlvl = await Helper.createFile(directoryName, 'annot0.json', '');
+        /*let annotlvl = await Helper.createFile(directoryName, 'annot0.json', '');
         if (!annotlvl) {
             return;
-        }
-
-        let imageDirectory = await Helper.createDirectory(directoryName+'/', 'images');
-        if (!imageDirectory){
-            return;
-        }
+        }*/
 
         //Se crearon todos los ficheros
         console.log("Se creo el proyecto correctamente.");
-        updateStore(configDir);
+        //updateStore(configDir);
         isOpenDialogNew.value = false;
         newProjectName = '';
     }
@@ -136,12 +188,12 @@
         const configProjectfile = await readTextFile(configDir, {
           baseDir: BaseDirectory.AppLocalData,
         });
-        someStore.saveProjectMetadata(configProjectfile);
+        mainStore.saveProjectMetadata(configProjectfile);
     }
 
     async function deleteProject (project:Project){
         
-        const directoryName = Helper.GetProyectDirectory(project.name); //Helper.GetStringWithoutSpaces(project.name);      
+        /*const directoryName = Helper.GetProyectDirectory(project.name); //Helper.GetStringWithoutSpaces(project.name);      
         await remove(directoryName, { baseDir: BaseDirectory.AppLocalData, recursive: true,});
         let tokenExists = await exists(directoryName, { baseDir: BaseDirectory.AppLocalData });
         if (tokenExists) {
@@ -149,7 +201,7 @@
             return false;
         }
         //Actualizar store
-        someStore.deleteProjectMetadata(project);
+        someStore.deleteProjectMetadata(project);*/
     }
 
     //Formularios

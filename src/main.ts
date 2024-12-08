@@ -9,6 +9,9 @@ import * as directives from 'vuetify/directives'
 import '@mdi/font/css/materialdesignicons.css'
 import Flicking from "@egjs/vue3-flicking";
 import "@egjs/vue3-flicking/dist/flicking.css";
+import Vue3Toasity, { type ToastContainerOptions } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
+
 
 const vuetify = createVuetify({
     components,
@@ -22,4 +25,10 @@ const vuetify = createVuetify({
 import { createPinia } from 'pinia'
 const pinia = createPinia()
 // end pinia
-createApp(App).use(vuetify).use(pinia).component("Flicking", Flicking).mount("#app");
+createApp(App).use(vuetify).use(pinia).use(
+  Vue3Toasity,
+  {
+    autoClose: 3000,
+    // ...
+  } as ToastContainerOptions,
+).component("Flicking", Flicking).mount("#app");

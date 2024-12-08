@@ -1,14 +1,16 @@
 import { defineStore } from 'pinia';
-import { LevelData, Project, NoteData, ParentChildIndex } from './item.model';
+import { LevelData, Project, FileNeedSave, NotifType } from './item.model';
 import { useLevelStore } from './loadedLvl';
-import Helper from '../Helper';
+import Helper from '../Helpers/Helper';
+import FilesHelper from '../Helpers/FilesHelper';
+import { toast, type ToastOptions } from 'vue3-toastify';
 
 interface State {
     appName: string;
     ldProjectsBaseDir: string | '';    
     actualConfigProject: Project;
     projects: Project[];
-
+    filesNeedSave: FileNeedSave[];
   }
 
 export const useMainStore = defineStore('main', {
@@ -17,10 +19,19 @@ export const useMainStore = defineStore('main', {
             appName: 'ProjectPlanningAssistant',
             ldProjectsBaseDir: '',            
             projects: [] as Project[],
-            actualConfigProject: {} as Project,            
+            actualConfigProject: {} as Project,
+            filesNeedSave: []as FileNeedSave[],     
         }
       },      
       actions: {       
+
+        notify(msg:string, tipe:NotifType) {
+          toast(msg, {
+            autoClose: 5500,
+            position: toast.POSITION.BOTTOM_RIGHT,
+            type: tipe,
+          } as ToastOptions);
+        },
 
         saveProjectMetadataArray(metadata: string[]) {
           metadata.forEach(element => {
@@ -46,6 +57,7 @@ export const useMainStore = defineStore('main', {
           return data.substring(1, data.length-1);          
         },
 
+        /*
         async createNewLevelNecesaryFiles(newLvl:LevelData, newLevlNumber:number) {
           const directoryName = Helper.GetProyectDirectory(this.actualConfigProject.name); 
 
@@ -64,16 +76,15 @@ export const useMainStore = defineStore('main', {
           console.log("Exito!");
           return true;
         },
-
-        updateConfigFile(newLevlNumber:number) {
+        */
+        /*updateConfigFile(newLevlNumber:number) {
           //actualizar config con el nuevo nivel 
-          this.actualConfigProject.totalLevels = newLevlNumber;
-          Helper.updateConfigFile(this.actualConfigProject);
-          //this.actualProjectLvls.push(emptyAnn);
-        },
+          this.actualConfigProject.totalNotes = newLevlNumber;
+          FilesHelper.updateConfigFile(this.actualConfigProject);          
+        },*/
       },
 
       getters: {
-        //lastLevel: (state) => (state.actualProjectLvls.length == 0) ? 0 : state.actualProjectLvls[state.actualProjectLvls.length-1].levelNumber,        
+        
       },
   })

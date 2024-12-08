@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
-import Helper from '../Helper';
-import { LevelData, Project, NoteData, ParentChildIndex } from './item.model';
+import Helper from '../Helpers/Helper';
+import { LevelData, Project, NoteData, ParentChildIndex, NotifType } from './item.model';
 import { useMainStore } from './mainStore';
 
 interface State {  
@@ -30,7 +30,7 @@ interface State {
 
     actions: {
       generateNewLevel():LevelData {
-        //Generamso todas las notas que va a tenr el nuevo nivel
+        //Generamos todas las notas que va a tener el nuevo nivel
         const nodosActuales = this.displayedLevel.noteList;
         const newLvlnumber = this.allLvls.length;
         let newLvlNotes = [] as NoteData[];
@@ -38,7 +38,7 @@ interface State {
           const newNote: NoteData = this.generateNote(this.getNewNoteID(), e.id, 'From: ' + e.name);
           newLvlNotes.push(newNote);
         });
-        return {levelNumber:newLvlnumber, noteList:newLvlNotes} as LevelData;
+        return {levelNumber:newLvlnumber, noteList:newLvlNotes, fragmented:false} as LevelData;
       },
 
       addNewLevel(newLevel:LevelData) {
@@ -269,6 +269,7 @@ interface State {
             return this.allLvls[lvl].noteList[i].name;
           }
         }
+        useMainStore().notify("Error al obtener nombre.", NotifType.error)
         return 'ERROR! (154)';
       },
 

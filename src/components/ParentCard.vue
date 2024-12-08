@@ -42,10 +42,8 @@
 </template>
 
 <script setup lang="ts">  
-    import Helper from '../Helper';
     import { useMainStore } from '../store/mainStore';
     import { useLevelStore } from '../store/loadedLvl';
-    import { LevelData, NoteData } from '../store/item.model';
 
     const store = useMainStore();
     const lvlStore = useLevelStore();
@@ -85,48 +83,10 @@
 
     async function addLvl() {  
         const newLvl =  lvlStore.generateNewLevel();
-        if (await store.createNewLevelNecesaryFiles(newLvl, lvlStore.displayedLevel.levelNumber)) {
+      /*  if (await lvlStore.createNewLevelFiles(newLvl)) {
             
             store.updateConfigFile(lvlStore.displayedLevel.levelNumber+1);
             lvlStore.addNewLevel(newLvl);
-        }
-        /*//Necesito listado de todos los nodos del nivel actual
-        // a cada nodo hay que generarle un hijo
-
-        const nodosActuales = lvlStore.displayedLevel.noteList;
-        const newLevlNumber =  (store.actualConfigProject.totalLevels); 
-        let newNodes = [] as NoteData[];
-        nodosActuales.forEach(e => {
-            const newNote: NoteData = {id: lvlStore.getNewNoteID(), parentId: e.id, name:'son of ' + e.name, 
-                                         annotationList: [], dirImageList: []};
-            newNodes.push(newNote);
-        });
-
-        let emptyAnn = Helper.generateLvlAnnotationEmty();
-        emptyAnn.noteList = newNodes;
-
-        if (await createNecesaryFiles(emptyAnn, newLevlNumber)) {
-            store.newLevelCreated(emptyAnn, newLevlNumber+1);
         }*/
     }
-
-    /*async function createNecesaryFiles(emptyAnn:LevelData, newLevlNumber:number) {
-
-        emptyAnn.levelNumber = newLevlNumber;
-        const directoryName = Helper.GetProyectDirectory(store.actualConfigProject.name);   
-
-        let level = await Helper.createFile(directoryName, 'level' + newLevlNumber +'.json', JSON.stringify(emptyAnn));
-        if (!level) {     
-            console.error("ERROR! Fallo al crear fichero")       
-            return false;
-        }
-    
-        let annotlvl = await Helper.createFile(directoryName, 'annot' + newLevlNumber +'.json', '');
-        if (!annotlvl) {
-            console.error("ERROR! Fallo al crear fichero")     
-            return false;
-        }
-        console.log("Exito!");
-        return true;
-    }   */
 </script>
