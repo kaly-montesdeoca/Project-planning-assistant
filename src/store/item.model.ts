@@ -3,29 +3,31 @@
 export interface NoteData {
     id: number;
     parentId: number;
-    name: string;    //30 max
+    name: string;    //30 max   
+    lvlID:number;
     annotationList: string[];
     dirImageList: string[];    
 }
 
 export interface LevelData {
-    levelNumber: number;
-    fragmented: boolean; //Borrar
+    id: number;
+    levelNumber: number; 
     noteList: NoteData[];
 }
 
 //info en archivo config
 export interface Project {
+    id:number;
     name: string;    
-    createDate: string;
     totalLevels: number;
+    createDate: string;    
 }
 
-//Para levantar el listado de 'tareas'
+/*//Para levantar el listado de 'tareas'
 export interface FileStringList {
     ownerId: number;
     stringList: string[];
-}
+}*/
 
 //relacion entre padre e indice del slider
 export interface ParentChildIndex {
@@ -42,8 +44,7 @@ export interface FileNeedSave {
 /*export interface ParentChildIndexArray {
     parentChildIndexArr: ParentChildIndex[];
 }*/
-
-export const Particionado = 10;
+export const DBName = "projectsDB.db";
 
 export enum NotifType {
     info = "info",

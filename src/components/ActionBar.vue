@@ -7,7 +7,7 @@
 
     <v-tooltip text="Buscar nota">
         <template v-slot:activator="{ props }">        
-            <v-btn icon="mdi-magnify" class="mx-2" @click="openSearch" v-bind="props"></v-btn>
+            <v-btn icon="mdi-magnify" class="mx-2" @click="openSearch" v-bind="props" :disabled="esRaiz()"></v-btn>
         </template>               
     </v-tooltip>
 
@@ -21,7 +21,6 @@
 </template>
 
 <script setup lang="ts">
-    import { useMainStore } from '../store/mainStore';
     import { useLevelStore } from '../store/loadedLvl';
 
     const lvlStore = useLevelStore();
@@ -38,14 +37,7 @@
     };
 
     function esRaiz() {
-        return lvlStore.displayedLevel.levelNumber === 0;
+        return lvlStore.allLvls.length === 0 || lvlStore.displayedLevel.levelNumber === 0 ;
     }
-    /*
-    function goToParent () {
-            console.log("Btn goToParent funcion");
-    };
-    function goToChild () {
-            console.log("Btn goToChild funcion");
-    };*/
 </script>
 

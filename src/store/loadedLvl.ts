@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import Helper from '../Helpers/Helper';
 import { LevelData, Project, NoteData, ParentChildIndex, NotifType } from './item.model';
 import { useMainStore } from './mainStore';
+import SqlHelper from '../Helpers/SqlHelper';
 
 interface State {  
     allLvls: LevelData[];    
@@ -29,33 +30,39 @@ interface State {
     },
 
     actions: {
-      generateNewLevel():LevelData {
+      async generateNewLevel() {
         //Generamos todas las notas que va a tener el nuevo nivel
-        const nodosActuales = this.displayedLevel.noteList;
         const newLvlnumber = this.allLvls.length;
+        const result = await SqlHelper.insertData(SqlHelper.INSERT_NIVEL_TABLE, [newLvlnumber, useMainStore().actualConfigProject.id]);
+
+        const nodosActuales = this.displayedLevel.noteList;
         let newLvlNotes = [] as NoteData[];
-        nodosActuales.forEach(e => {
-          const newNote: NoteData = this.generateNote(this.getNewNoteID(), e.id, 'From: ' + e.name);
+        for (let i=0; i < nodosActuales.length; i++) {
+          const resultNote = await SqlHelper.insertData(SqlHelper.INSERT_NOTE_TABLE, [nodosActuales[i].id, 'From: ' + nodosActuales[i].name, result.lastInsertId]);
+          const newNote: NoteData = this.generateNote(resultNote.lastInsertId, nodosActuales[i].id, 'From: ' + nodosActuales[i].name, result.lastInsertId);
           newLvlNotes.push(newNote);
-        });
-        return {levelNumber:newLvlnumber, noteList:newLvlNotes, fragmented:false} as LevelData;
-      },
+        }
 
-      addNewLevel(newLevel:LevelData) {
-        console.log("crea")
+        const newLevel:LevelData = {id: result.lastInsertId, levelNumber:newLvlnumber, noteList:newLvlNotes} as LevelData;
         this.allLvls.push(newLevel);
+
+        //this.displayedLevel.levelNumber =+ 1;
+        if (newLvlnumber >= 2) {
+          this.addNewSliderIndex(this.allLvls[this.allLvls.length-1].noteList, this.allLvls.length-3);
+        }
+        return true;
       },
 
-      addNewNote(newNoteName:string) {
-        const newID = this.createChild(this.displayedParent.id, this.displayedLevel.levelNumber, newNoteName);
-        let thisLvl= this.displayedLevel.levelNumber;
+      async addNewNote(newNoteName:string) {
+        const newID = await this.createChild(this.displayedParent.id, this.displayedLevel.levelNumber, newNoteName);       
+        let thisLvl = this.displayedLevel.levelNumber;
         if (thisLvl < this.allLvls.length-1) {
           //Crear la descendencia
           //Primero agregar al sliderIndex
           this.addItemSilderIndex(thisLvl-1, newID);
           thisLvl += 1;
           for (thisLvl; thisLvl < this.allLvls.length; thisLvl++){
-            this.createChild(newID, thisLvl, 'son of: '+newID);
+            this.createChild(newID, thisLvl, 'From: '+newNoteName);
           }
         }
 
@@ -68,7 +75,7 @@ interface State {
         this.parentSliderIndexArr[lvlToAdd].push({parentId: IDToAdd, childIndexInf:indexValue, childIndexSup:indexValue-1} as ParentChildIndex)
       },
 
-      createChild(parentId:number, lvl:number, name:string):number {
+      async createChild(parentId:number, lvl:number, name:string) {
         let indexOfNewElement;
         //Caso exepcional, Nivel 1 solo tiene un padre :. es mas simple
         if (lvl === 1 ) {
@@ -80,21 +87,14 @@ interface State {
           console.log("parentID: " + parentId + ' lvl: ' + lvl);
           indexOfNewElement = this.updateSliderIndex(parentId, this.parentSliderIndexArr[lvl-2]);
         }
-        const newID = this.getNewNoteID();
-        const newNote: NoteData = this.generateNote(newID, parentId, name);
+        const resultNote = await SqlHelper.insertData(SqlHelper.INSERT_NOTE_TABLE, [parentId, name, this.allLvls[lvl].id]);
+        const newID = resultNote.lastInsertId;
+        const newNote: NoteData = this.generateNote(newID, parentId, name, this.allLvls[lvl].id);
         this.allLvls[lvl].noteList.splice(indexOfNewElement, 0, newNote);
-        return newID;
+        return (newID === undefined) ? -1 : newID;
       },
 
-      generateNote(id:number, parentId:number, name:string,):NoteData {
-        return {
-          id: id,
-          parentId: parentId,
-          name: name,
-          annotationList: [],
-          dirImageList: []
-        } as NoteData;
-      },
+
 
       updateSliderIndex(parentId:number, sliderIndex:ParentChildIndex[]):number {
         //Primero necesito la posicion en el arreglo de IndexSlider
@@ -114,6 +114,17 @@ interface State {
         }
 
         return indexOfNewElement;
+      },
+
+      generateNote(id:number | undefined, parentId:number | undefined, name:string, lvlID:number | undefined):NoteData {
+        return {
+          id: id,
+          parentId: parentId,
+          name: name,         
+          lvlID: lvlID,
+          annotationList: [],
+          dirImageList: []
+        } as NoteData;
       },
 
       goToLevel(level:number) {
@@ -178,23 +189,6 @@ interface State {
         return result;
       },
 
-      sumChildConcurrency(level:number, parentId:number) :void {
-        //Si no existe el nivel, lo creamos
-        if(!(level in this.parentSliderIndexArr)) {
-          const emptyLvl: ParentChildIndex[] = [] as ParentChildIndex[];
-          this.parentSliderIndexArr.push(emptyLvl);
-        }
-
-        let index = this.parentSliderIndexArr[level].findIndex(n => n.parentId === parentId);
-           //Sí el parent/index ya existe, solo hay que sumar uno
-        if (index >= 0) {
-          this.parentSliderIndexArr[level][index].childIndexInf += 1;
-        } else {
-          //el parent/index no existe, se crea con index 1
-          const newChildCount:ParentChildIndex = {parentId: parentId, childIndexInf : 1, childIndexSup: 0} as ParentChildIndex;
-          this.parentSliderIndexArr[level].push(newChildCount);
-        }
-      },
 
       getNote(array:NoteData[], id:number):NoteData {
         for (let i = 0; i < array.length; i++){
@@ -226,18 +220,43 @@ interface State {
       },
 
       //Carga del arreglo de arreglos de Parent/index
-      //Casa nivel tiene un arreglo de 'ParentChildIndex'
+      //Cada nivel tiene un arreglo de 'ParentChildIndex'
       //Exepto nivel 0 y 1.
       generateChildrenIndex(levelsData: LevelData[]):void {
         let lvlCount = levelsData.length -2;
         if ( lvlCount <= 0 ) { return; }
         for (let i = 0; i <lvlCount; i++) {
-          levelsData[i+2].noteList.forEach( note => {
+          /*levelsData[i+2].noteList.forEach( note => {
             this.sumChildConcurrency(i, note.parentId);
-          })
-          //Una vez aca, ya estan todas las notas contabilizadas
+          })*/
+          this.addNewSliderIndex(levelsData[i+2].noteList, i);
+        }
+      },
+
+      addNewSliderIndex(noteList:NoteData[], lvl:number) {
+        //Si no existe el nivel, lo creamos
+        if(!(lvl in this.parentSliderIndexArr)) {
+          const emptyLvl: ParentChildIndex[] = [] as ParentChildIndex[];
+          this.parentSliderIndexArr.push(emptyLvl);
+        }
+        noteList.forEach( note => {
+          this.sumChildConcurrency(lvl, note.parentId);
+        })   
+           //Una vez aca, ya estan todas las notas contabilizadas
           //Ahora toca crear el indice 
-          this.translateIndex(i);
+          this.translateIndex(lvl);    
+      },
+      
+      sumChildConcurrency(level:number, parentId:number) :void {
+        let index = this.parentSliderIndexArr[level].findIndex(n => n.parentId === parentId);
+           //Sí el parent/index ya existe, solo hay que sumar uno
+        if (index >= 0) {
+          this.parentSliderIndexArr[level][index].childIndexInf += 1;
+        } else {
+          //el parent/index no existe, se crea con index 1
+          //childIndexInf temporalmente es un contador de ocurrencias
+          const newChildCount:ParentChildIndex = {parentId: parentId, childIndexInf : 1, childIndexSup: 0} as ParentChildIndex;
+          this.parentSliderIndexArr[level].push(newChildCount);
         }
       },
 
@@ -271,11 +290,6 @@ interface State {
         }
         useMainStore().notify("Error al obtener nombre.", NotifType.error)
         return 'ERROR! (154)';
-      },
-
-      getNewNoteID():number {
-        this.notesCount +=1;
-        return this.notesCount;
       },
     },
     getters: {},

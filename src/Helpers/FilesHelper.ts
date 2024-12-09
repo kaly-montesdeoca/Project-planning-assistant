@@ -1,7 +1,6 @@
 import { create, mkdir, BaseDirectory, exists } from '@tauri-apps/plugin-fs';
-import { LevelData, FileStringList, Project, ParentChildIndex, NoteData, NotifType } from "../store/item.model";
+import { NotifType } from "../store/item.model";
 import { useMainStore } from '../store/mainStore';
-import { useLevelStore } from '../store/loadedLvl';
 
 export default class FilesHelper {
 
@@ -11,33 +10,26 @@ export default class FilesHelper {
         return await this.createDirectory('', this.getStringWithoutSpaces(newProjectName))
     }
 
-    static async createConfigFile(newProjectName:string) {       
+    /*static async createConfigFile(newProjectName:string) {       
         const content = '['+ newProjectName +']\r\n['+ new Date() +']\r\n[1]';
         return await this.createFile(this.getStringWithoutSpaces(newProjectName), 'config.txt', content);
-    }
+    }*/
 
-    static async createDataFile(newProjectName:string) {
-        const emptyNoteData: NoteData[] = [{id: 0, parentId: 0, name:newProjectName, annotationList: [], dirImageList: []}];
-        const emmptyLvlData: LevelData = { levelNumber: 0, noteList: emptyNoteData, fragmented:false };
-
-        return await this.createFile(this.getStringWithoutSpaces(newProjectName), 'data0.json', JSON.stringify(emmptyLvlData));
-    }
-
-    static async createNewLevelFiles(newLvl:LevelData) {
+    /*static async createNewLevelFiles(newLvl:LevelData) {
         
 
-    }
+    }*/
 
-    static getConfigProyect(projectName:String) {        
+    /*static getConfigProyect(projectName:String) {        
         return this.baseDirectory + this.getStringWithoutSpaces(projectName) + '/config.txt';
-    }
+    }*/
 
-    static updateConfigFile(data:Project) {
+    /*static updateConfigFile(data:Project) {
         const directoryName = this.getProyectDirectory(data.name);
         const fileData = this.generateConfigString(data);
         this.generateConfigString(data);
         this.createFile(directoryName, 'config.txt', fileData);
-    }
+    }*/
 
     static async createFile(directoryName:string, fileName:string, data:string) {
         const completePath = this.baseDirectory + directoryName + '/' + fileName;
@@ -68,13 +60,13 @@ export default class FilesHelper {
         return true;
     }
 
-    static generateConfigString(data:Project):string {        
+    /*static generateConfigString(data:Project):string {        
         let dataFile = '';
         Object.entries(data).forEach(([key, value]) => {
             dataFile += '[' + `${value}` + ']\r\n'                
         });
         return dataFile;
-    }
+    }*/
 
     //Utils
 
@@ -91,7 +83,7 @@ export default class FilesHelper {
         return result;
     }
 
-    static getConfigDir(projectName:String) {        
+   /* static getConfigDir(projectName:String) {        
         return this.baseDirectory + this.getStringWithoutSpaces(projectName) + '/config.txt';
-    } 
+    } */
 }

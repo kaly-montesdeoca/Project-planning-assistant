@@ -44,6 +44,7 @@
 <script setup lang="ts">  
     import { useMainStore } from '../store/mainStore';
     import { useLevelStore } from '../store/loadedLvl';
+import { NotifType } from '../store/item.model';
 
     const store = useMainStore();
     const lvlStore = useLevelStore();
@@ -82,11 +83,11 @@
     }
 
     async function addLvl() {  
-        const newLvl =  lvlStore.generateNewLevel();
-      /*  if (await lvlStore.createNewLevelFiles(newLvl)) {
-            
-            store.updateConfigFile(lvlStore.displayedLevel.levelNumber+1);
-            lvlStore.addNewLevel(newLvl);
-        }*/
+        const newLvl = await lvlStore.generateNewLevel();
+        if (newLvl) {
+            store.notify("Nivel añadido.", NotifType.success);
+        } else {
+            store.notify("Error al intentar añadir el nivel.", NotifType.error);
+        }
     }
 </script>

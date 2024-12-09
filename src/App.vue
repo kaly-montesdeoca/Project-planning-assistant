@@ -19,8 +19,8 @@
         <div class="position-absolute bottom-0 right-0 pb-2">
             <action-bar @oMenu="openMenuDialog()" @oNewNote="openNewNoteDialog()"/>
             <menu-dialog ref="menuDialog" />
-            <new-note-dialog ref="newNOteDialog" />        
-            <v-btn @click="dbtest"> db</v-btn>    
+            <new-note-dialog ref="newNOteDialog" />      
+          
         </div> 
 
     </v-container> 
@@ -31,16 +31,14 @@
     import { useLevelStore } from './store/loadedLvl';
     import Helper from './Helpers/Helper';
     import FilesHelper from './Helpers/FilesHelper';
-    import { FileNeedSave, NotifType } from './store/item.model';
+    import SqlHelper from './Helpers/SqlHelper';
+    import { FileNeedSave, NotifType, Project } from './store/item.model';
     import { readDir, readTextFile, BaseDirectory, exists } from '@tauri-apps/plugin-fs';
     import ActionBar from "./components/ActionBar.vue";
     import MenuDialog from "./components/MenuDialog.vue";
     import ParentCard from './components/ParentCard.vue';
     import NewNoteDialog from './components/NewNoteDialog.vue';
-    import Notes from "./components/Notes.vue";  
-
-    import Database from '@tauri-apps/plugin-sql';
-    
+    import Notes from "./components/Notes.vue";   
     
     const lvlStore = useLevelStore();
     const mainStore = useMainStore();
@@ -50,34 +48,8 @@
         menuDialog.value.open();
     };
 
-    async function dbtest() {
-        const db = await Database.load('sqlite:C:/Users/Kaly/AppData/Local/com.ppa.app/ProjectsFiles/Test1/testdb.db');
-        
-        //const result:TestType[] = await db.select("SELECT ID, Numero FROM Nivel;")// .execute("SELECT ID, Numero FROM Nivel;");
-       
-        //console.log(result[0].ID);
-    }
-
     function openNewNoteDialog() {
         newNOteDialog.value.open();
-    }
-
-    //Levanta los archivos config de c/proyecto
-    async function loadData() {
-        const entries = await readDir('ProjectsFiles', { baseDir: BaseDirectory.AppLocalData });
-        let projectConfig = [];
-        for (const element of entries ) {
-            const tokenExists = await exists(FilesHelper.getConfigDir(element.name), { baseDir: BaseDirectory.AppLocalData });
-            if (tokenExists) {        
-                const configProjectfile = await readTextFile(FilesHelper.getConfigDir(element.name), {
-                baseDir: BaseDirectory.AppLocalData,
-                });
-                projectConfig.push(configProjectfile);
-            } else {
-                mainStore.notify("Falta fichero Config de projecto " + element.name, NotifType.error);            
-            }
-        }    
-        mainStore.saveProjectMetadataArray(projectConfig);        
     }
 
     function projecLoaded() {
@@ -106,9 +78,26 @@
             //fileData = lvlStore.
         }
     }
+
+    async function loadProjects() {
+        const projects =  await SqlHelper.readProyectTable();
+        const myProjects:Project[] = [];
+        projects?.forEach(p => {
+            const newProject:Project = {
+                id:p.id,
+                name: p.name,
+                totalLevels: p.totalLevels,
+                createDate: p.createDate 
+            };
+            myProjects.push(newProject);
+        })
+        if (projects !== undefined) {
+            mainStore.saveProjectMetadataArray(myProjects); 
+        }
+    }
     
     onMounted(() => {
-        loadData();
+        loadProjects();
     })
 
 </script>

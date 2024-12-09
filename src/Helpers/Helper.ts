@@ -1,5 +1,4 @@
-import { LevelData, FileStringList, Project, ParentChildIndex } from "../store/item.model";
-import { create, mkdir, BaseDirectory, exists } from '@tauri-apps/plugin-fs';
+import { ParentChildIndex } from "../store/item.model";
 
 export default class Helper {  
 
@@ -53,15 +52,15 @@ export default class Helper {
         return 0;
     }
 
-    static printArray(array:[]) {
+    /*static printArray(array:[]) {
         let result ='[';
         array.forEach((key, value) => {
             result += key + ' :' + value.toString() + ', ';
         })
         result += ']';
-    }
+    }*/
 
-
+/*
     //  VER DONDE SE USA
     static generateAnnotationEmty() {
         const emptyStringList: FileStringList = {ownerId: 0, stringList: []};
@@ -81,7 +80,7 @@ export default class Helper {
         });
         return levelObj;
     }  
-
+*/
     //Files
     /*
     static baseDirectory ="ProjectsFiles/";

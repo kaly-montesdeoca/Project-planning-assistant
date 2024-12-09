@@ -33,10 +33,14 @@ export const useMainStore = defineStore('main', {
           } as ToastOptions);
         },
 
-        saveProjectMetadataArray(metadata: string[]) {
+        /*saveProjectMetadataArray(metadata: string[]) {
           metadata.forEach(element => {
             this.saveProjectMetadata(element);
           });          
+        },*/
+
+        saveProjectMetadataArray(proyects:Project[]) {
+          this.projects = proyects;
         },
 
         saveProjectMetadata(metadata: string) {
@@ -45,7 +49,7 @@ export const useMainStore = defineStore('main', {
             const cDate = this.getDataFromConfigLine(metaProjec[1]);
             const totalLvl = parseInt(this.getDataFromConfigLine(metaProjec[2]));
       
-            this.projects.push({name: name, createDate: cDate, totalLevels: totalLvl});
+            //this.projects.push({name: name, createDate: cDate, totalLevels: totalLvl});
         },
         
         deleteProjectMetadata(project:Project) {
