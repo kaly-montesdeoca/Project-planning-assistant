@@ -5,9 +5,16 @@ export interface NoteData {
     parentId: number;
     name: string;    //30 max   
     lvlID:number;
-    annotationList: string[];
+    annotationList: Annotation[];
     dirImageList: string[];    
 }
+
+export interface Annotation {
+    id: number;
+    data: string; 
+    note_id: number;
+}
+
 
 export interface LevelData {
     id: number;

@@ -17,10 +17,10 @@
             <h1>No hay proyecto seleccionado</h1>
         </v-row>
         <div class="position-absolute bottom-0 right-0 pb-2">
-            <action-bar @oMenu="openMenuDialog()" @oNewNote="openNewNoteDialog()"/>
+            <action-bar @oMenu="openMenuDialog()" @oNewNote="openNewNoteDialog()" @oSearch="openSearchDialog()"/>
             <menu-dialog ref="menuDialog" />
-            <new-note-dialog ref="newNOteDialog" />      
-          
+            <new-note-dialog ref="newNOteDialog" />
+            <SearchDialog ref="SearchDialogRef" />
         </div> 
 
     </v-container> 
@@ -29,27 +29,31 @@
     import { ref, onMounted } from 'vue'
     import { useMainStore } from './store/mainStore'; 
     import { useLevelStore } from './store/loadedLvl';
-    import Helper from './Helpers/Helper';
-    import FilesHelper from './Helpers/FilesHelper';
     import SqlHelper from './Helpers/SqlHelper';
-    import { FileNeedSave, NotifType, Project } from './store/item.model';
-    import { readDir, readTextFile, BaseDirectory, exists } from '@tauri-apps/plugin-fs';
+    import { FileNeedSave,  Project } from './store/item.model';
     import ActionBar from "./components/ActionBar.vue";
     import MenuDialog from "./components/MenuDialog.vue";
     import ParentCard from './components/ParentCard.vue';
     import NewNoteDialog from './components/NewNoteDialog.vue';
     import Notes from "./components/Notes.vue";   
-    
+    import SearchDialog from './components/SearchDialog.vue';
+
     const lvlStore = useLevelStore();
     const mainStore = useMainStore();
     const menuDialog = ref();
     const newNOteDialog = ref();
+    const SearchDialogRef = ref();
+
     function openMenuDialog() {
         menuDialog.value.open();
     };
 
     function openNewNoteDialog() {
         newNOteDialog.value.open();
+    }
+
+    function openSearchDialog() {
+        SearchDialogRef.value.open();
     }
 
     function projecLoaded() {

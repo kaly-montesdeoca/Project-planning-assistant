@@ -51,7 +51,7 @@
     import { useMainStore } from '../store/mainStore';
     import { useLevelStore } from '../store/loadedLvl';
     import FilesHelper from '../Helpers/FilesHelper';
-    import { Project, NoteData, LevelData, NotifType } from '../store/item.model';
+    import { Project, NoteData, LevelData, NotifType, Annotation } from '../store/item.model';
     import SqlHelper from '../Helpers/SqlHelper';
 
 
@@ -74,21 +74,24 @@
     async function loadProject (project:Project){
         mainStore.actualConfigProject = project
         const allLvls: LevelData[] = []; 
+        let allNotes: NoteData[] = [];
         const levels = await SqlHelper.readLevelTable(project.id);
         if(levels) {
             for(let i= 0; i < levels.length; i++){
                 const notes:NoteData[] = await SqlHelper.readNoteTable(levels[i].id);                
                 for(let j=0; j < notes.length; j++){
-                    const annotations:string[] = await SqlHelper.readAnnotationTable(notes[j].id);
+                    const annotations:Annotation[] = await SqlHelper.readAnnotationTable(notes[j].id);
                     const imgs:string[] = await SqlHelper.readImgsTable(notes[j].id);
-                    notes[j].annotationList = annotations;
+                    notes[j].annotationList = annotations;                    
                     notes[j].dirImageList = imgs;
                 }
 
                 const lvl:LevelData = {id: levels[i].id, levelNumber: levels[i].levelNumber, noteList: notes};                
                 allLvls.push(lvl);
+                allNotes = allNotes.concat(notes);
             }
-        }       
+        } 
+        lvlStore.loadSearchNotes(allNotes);      
         lvlStore.loadProject(allLvls);
         isOpenDialogMenu.value = false;
     }

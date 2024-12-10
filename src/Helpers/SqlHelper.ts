@@ -1,5 +1,5 @@
 import Database, { QueryResult } from '@tauri-apps/plugin-sql';
-import { DBName, LevelData, Project, NoteData } from '../store/item.model';
+import { DBName, LevelData, Project, NoteData, Annotation } from '../store/item.model';
 
 export default class SqlHelper {
 
@@ -74,7 +74,7 @@ export default class SqlHelper {
     static async readAnnotationTable(noteId:number) {
         try {
             const db = await Database.load(this.sqliteDirectory + DBName);
-            const result:string[] = await db.select("SELECT data FROM Annotation WHERE note_id = $1;", [noteId]);
+            const result:Annotation[] = await db.select("SELECT id, data, note_id FROM Annotation WHERE note_id = $1;", [noteId]);
 
             db.close();
             return result;
@@ -105,7 +105,7 @@ export default class SqlHelper {
             console.log(e);
         }
     }
-
+    
     static CREATE_PROYECTO_TABLE = 'CREATE TABLE "Proyecto" ( "id"	INTEGER NOT NULL UNIQUE, "nombre" TEXT NOT NULL, "niveles_count"	INTEGER NOT NULL DEFAULT 1, "created_at"	INTEGER, PRIMARY KEY("id" AUTOINCREMENT))';
     static CREATE_NIVEL_TABLE ='CREATE TABLE "Nivel" ("id"	INTEGER NOT NULL UNIQUE, "numero" INTEGER NOT NULL,	"proyecto_id"	INTEGER NOT NULL DEFAULT 0,	PRIMARY KEY("id" AUTOINCREMENT))';
     static CREATE_NOTE_TABLE = 'CREATE TABLE "Note" ("id"	INTEGER NOT NULL UNIQUE, "parent_id"	INTEGER NOT NULL,	"name"	TEXT NOT NULL,	PRIMARY KEY("id" AUTOINCREMENT))';
@@ -113,7 +113,10 @@ export default class SqlHelper {
     static CREATE_IMAGES_TABLE = 'CREATE TABLE "Images" ("id"	INTEGER NOT NULL UNIQUE,"dir"	TEXT NOT NULL, "note_id"	INTEGER NOT NULL, PRIMARY KEY("id" AUTOINCREMENT));';
     
     static READ_PROYECTO_TABLE = 'SELECT id, nombre as name, niveles_count as totalLevels, created_at as createDate FROM Proyecto';
-
+    
     static INSERT_NIVEL_TABLE = "INSERT INTO Nivel (numero, proyecto_id) VALUES ($1, $2)";
     static INSERT_NOTE_TABLE = "INSERT INTO Note (parent_id, name, level_id) VALUES ($1, $2, $3)";
+    static INSERT_ANNOTTATION_TABLE = "INSERT INTO Annotation (note_id, data) VALUES ($1, $2)";
+    
+    static UPDATE_ANNOTATION_TABLE = "UPDATE Annotation SET data = $1 WHERE id = $2";
 }

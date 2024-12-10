@@ -8,6 +8,7 @@ interface State {
     allLvls: LevelData[];    
     displayedLevel: LevelData;
     displayedParent: NoteData;
+    searchNotes: NoteData[];
     notesCount: number;   
     parentSliderIndexArr: ParentChildIndex[][];
     displayedSliderIndexArray: ParentChildIndex[];
@@ -21,6 +22,7 @@ interface State {
           allLvls: [] as LevelData[],
           displayedLevel: {} as LevelData,
           displayedParent: {} as NoteData,
+          searchNotes: [] as NoteData[],
           notesCount: 0,  
           parentSliderIndexArr: [],
           displayedSliderIndexArray: [],
@@ -69,7 +71,6 @@ interface State {
       },
 
       addItemSilderIndex(lvlToAdd:number, IDToAdd:number) {
-        console.log("lvlToAdd: "+lvlToAdd);
         const lastPos = this.parentSliderIndexArr[lvlToAdd].length-1;
         const indexValue = this.parentSliderIndexArr[lvlToAdd][lastPos].childIndexSup +1;
         this.parentSliderIndexArr[lvlToAdd].push({parentId: IDToAdd, childIndexInf:indexValue, childIndexSup:indexValue-1} as ParentChildIndex)
@@ -84,7 +85,6 @@ interface State {
           //En el resto de casos es necesaro actualizar el 
           //indice del slider, y de paso obtener la posicion
           //de la nueva nota en el arreglo de notas
-          console.log("parentID: " + parentId + ' lvl: ' + lvl);
           indexOfNewElement = this.updateSliderIndex(parentId, this.parentSliderIndexArr[lvl-2]);
         }
         const resultNote = await SqlHelper.insertData(SqlHelper.INSERT_NOTE_TABLE, [parentId, name, this.allLvls[lvl].id]);
@@ -166,8 +166,6 @@ interface State {
         if (lvl-1 === 0) {
           this.displayedParent = this.allLvls[0].noteList[0];
         } else {         
-          //let index = this.getIDIndexNotes(this.allLvls[lvl-1].noteList, nextParent)//this.allLvls[lvl-1].noteList.findIndex(n => {n.id === nextParent})
-          console.log("Indice 1: " + index + " lvl: " + lvl + ' nextParent: ' + nextParent);
           this.displayedParent = this.allLvls[lvl-1].noteList[nextParent];
         }     
         this.updateParentName();    
@@ -180,7 +178,7 @@ interface State {
           
         const maxIndex = this.allLvls[this.displayedLevel.levelNumber-1].noteList.length;
         const result = myIndex + direction; 
-        console.log("lvlF: " + lvlF + "idF: " + idF + " myIndex: " + myIndex + " maxIndex: " +maxIndex +" result:" +result);
+       
         if (result === -1) {
           return maxIndex -1;
         } else if (result >= maxIndex) {
@@ -206,6 +204,19 @@ interface State {
           }
         }
         return -1;
+      },
+
+      getLevelByID(idLvl:number) {
+        for (let i = 0; i < this.allLvls.length; i++){
+          if (this.allLvls[i].id === idLvl) {
+            return i;
+          }
+        }
+        return -1;
+      },
+
+      getSliderIndexByIDandLvl(noteID:number, lvlNumber:number){
+        return this.getIDIndexNotes(this.allLvls[lvlNumber].noteList, noteID);
       },
 
       translateIndex (i:number):void {
@@ -267,8 +278,21 @@ interface State {
         this.generateChildrenIndex(levelsData);
       },
 
+      loadSearchNotes(notes: NoteData[]):void {
+        this.searchNotes = notes;
+      },
+
       getDisplayedParentName ():string {
         return this.displayedParent.name;
+      },
+
+      getSliderIndexByParentID(idParent:number, lvl:number):number {
+        for (let i = 0; i < this.parentSliderIndexArr.length; i++){
+          if (this.parentSliderIndexArr[lvl-2][i].parentId === idParent) {
+            return this.parentSliderIndexArr[lvl-2][i].childIndexInf;
+          }
+        }
+        return 0;
       },
 
       getParentName (idParent:number):string {

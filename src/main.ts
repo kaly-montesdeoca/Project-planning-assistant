@@ -11,7 +11,8 @@ import Flicking from "@egjs/vue3-flicking";
 import "@egjs/vue3-flicking/dist/flicking.css";
 import Vue3Toasity, { type ToastContainerOptions } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
-
+import { PerfectScrollbarPlugin } from 'vue3-perfect-scrollbar';
+import 'vue3-perfect-scrollbar/style.css';
 
 const vuetify = createVuetify({
     components,
@@ -25,7 +26,7 @@ const vuetify = createVuetify({
 import { createPinia } from 'pinia'
 const pinia = createPinia()
 // end pinia
-createApp(App).use(vuetify).use(pinia).use(
+createApp(App).use(vuetify).use(PerfectScrollbarPlugin).use(pinia).use(
   Vue3Toasity,
   {
     autoClose: 3000,

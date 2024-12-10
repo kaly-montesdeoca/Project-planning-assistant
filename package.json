@@ -17,6 +17,7 @@
     "@tauri-apps/plugin-sql": "^2.0.2",
     "pinia": "^2.2.8",
     "vue": "^3.3.4",
+    "vue3-perfect-scrollbar": "^2.0.0",
     "vue3-snackbar": "^2.3.4",
     "vue3-toastify": "^0.2.5",
     "vuetify": "^3.7.4"

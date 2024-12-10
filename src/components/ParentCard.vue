@@ -44,7 +44,7 @@
 <script setup lang="ts">  
     import { useMainStore } from '../store/mainStore';
     import { useLevelStore } from '../store/loadedLvl';
-import { NotifType } from '../store/item.model';
+    import { NotifType } from '../store/item.model';
 
     const store = useMainStore();
     const lvlStore = useLevelStore();

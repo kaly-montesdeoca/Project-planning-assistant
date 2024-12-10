@@ -7,7 +7,7 @@
 
     <v-tooltip text="Buscar nota">
         <template v-slot:activator="{ props }">        
-            <v-btn icon="mdi-magnify" class="mx-2" @click="openSearch" v-bind="props" :disabled="esRaiz()"></v-btn>
+            <v-btn icon="mdi-magnify" class="mx-2" @click="openSearch" v-bind="props" :disabled="projectsLoaded()"></v-btn>
         </template>               
     </v-tooltip>
 
@@ -24,20 +24,26 @@
     import { useLevelStore } from '../store/loadedLvl';
 
     const lvlStore = useLevelStore();
-    const emit = defineEmits(['oMenu', 'oNewNote'])
+    const emit = defineEmits(['oMenu', 'oNewNote', 'oSearch'])
 
     function openMenu () {            
         emit('oMenu', '');
     };
+
     function openSearch () {
-            console.log("Btn OpenSearch funcion");
+        emit('oSearch', '');
     };
+
     function openAddNote () {
         emit('oNewNote', '');
     };
 
+    function projectsLoaded() {
+        return lvlStore.allLvls.length === 0;
+    }
+
     function esRaiz() {
-        return lvlStore.allLvls.length === 0 || lvlStore.displayedLevel.levelNumber === 0 ;
+        return projectsLoaded() || lvlStore.displayedLevel.levelNumber === 0 ;
     }
 </script>
 

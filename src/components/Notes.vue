@@ -2,8 +2,8 @@
 <div class="">   
     <v-row class="mt-16">
         <v-col>    
-            <flicking :options="{ align: 'center', circular: true, moveType: 'freeScroll', interruptable: false, duration: 100 }" @changed="indexChanged" ref="flickingComp" @moveEnd="stopMooving">            
-                <note v-for="(note, n) in displayedLevel.noteList" :note-name="note.name" :annotationList="note.annotationList" :key="n"/>           
+            <flicking :options="{ align: 'center', circular: true, moveType: 'freeScroll', interruptable: false, duration: 100, preventClickOnDrag: true }" @changed="indexChanged" ref="flickingComp" @moveEnd="stopMooving">            
+                <note v-for="(note, n) in displayedLevel.noteList" :note-id="note.id" :note-name="note.name" :annotationList="note.annotationList" :key="n"/>           
             </flicking> 
         </v-col>
     </v-row>    
