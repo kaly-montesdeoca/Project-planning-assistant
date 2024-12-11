@@ -3033,7 +3033,7 @@ dependencies = [
 
 [[package]]
 name = "project-planning-assistant"
-version = "0.0.1"
+version = "0.0.2"
 dependencies = [
  "log",
  "serde",

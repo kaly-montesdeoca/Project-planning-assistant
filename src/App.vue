@@ -21,8 +21,7 @@
             <menu-dialog ref="menuDialog" />
             <new-note-dialog ref="newNOteDialog" />
             <SearchDialog ref="SearchDialogRef" />                         
-            <NotifyAsk ref="ask" @oClick="respond"></NotifyAsk>  
-            <v-btn @Click="preguntar()">a</v-btn>          
+            <NotifyAsk ref="ask"></NotifyAsk>                    
         </div> 
 
     </v-container> 
@@ -33,7 +32,7 @@
     import { useLevelStore } from './store/loadedLvl';
     import SqlHelper from './Helpers/SqlHelper';
     import {  NotifType, Project } from './store/item.model';
-    import { warn, debug, trace, info, error } from '@tauri-apps/plugin-log';
+    //import { warn, debug, trace, info, error } from '@tauri-apps/plugin-log';
     import ActionBar from "./components/ActionBar.vue";
     import MenuDialog from "./components/MenuDialog.vue";
     import ParentCard from './components/ParentCard.vue';
@@ -49,19 +48,8 @@
     const ask = ref();
 
     import NotifyAsk from './components/NotifyAsk.vue';
-    import { invoke } from '@tauri-apps/api/core';
+    import { invoke } from '@tauri-apps/api/core';  
 
-    async function preguntar() {
-        ask.value.open('Atención', 'Actualizacion disponible', { color: 'green', width: 500, zIndex: 200 }).then((ask:boolean) => {
-          if (ask) {
-            console.log(ask);
-          }
-        })
-    }    
-
-    function respond(value:boolean) {
-        console.log(value);
-    }
     async function checkForAppUpdates() {
         const update = await check();
         let accept = false;
@@ -74,12 +62,15 @@
                     accept = true;                    
                 }
              })
-             await update.downloadAndInstall();
-            await invoke("graceful_restart");
+             if(accept) {
+                 await update.downloadAndInstall();
+                await invoke("graceful_restart");
+                         }
         } else {
             mainStore.notify("Sistema actualizado", NotifType.info);
         }
     };
+
     function openMenuDialog() {
         menuDialog.value.open();
     };
@@ -112,7 +103,7 @@
             mainStore.saveProjectMetadataArray(myProjects); 
         }
     }
-    function forwardConsole(
+    /*function forwardConsole(
         fnName: 'log' | 'debug' | 'info' | 'warn' | 'error',
         logger: (message: string) => Promise<void>
         ) {
@@ -121,7 +112,7 @@
             original(message);
             logger(message);
         };
-    }
+    }*/
     
     onMounted(() => {
         loadProjects();
