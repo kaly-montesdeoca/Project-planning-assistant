@@ -5,7 +5,7 @@
   "platforms": {
     "windows-x86_64": {
       "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVTcHNURU1MQm5raUhNbzkwS2k0TEIxZ1V2cTZVVEJMem5TS0VLRldsL08zZEhsb3Iyd0dpdDFhczN3L3pKR0xiZ2tyajZYa3A1eFdCSzBJU1hzVGo0azFJNGxIWm5XVXdjPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzMzOTQwNzA4CWZpbGU6cHJvamVjdC1wbGFubmluZy1hc3Npc3RhbnRfMC4wLjJfeDY0LXNldHVwLmV4ZQprTUNYOGhGTEtvMjZxNFRLK3FQUzVwbHY5bDJXVmZDR1dBT2RkSGR3QW9tTlc1S0EwVzRXUThteVJKWUlKWHJsYllzZldxVzZrSDA2c0dRZm1RMVhCdz09Cg==",
-      "url": "https://github.com/kaly-montesdeoca/Project-planning-assistant/releases/0.0.2/project-planning-assistant_0.0.2_x64-setup.exe"
+      "url": "https://github.com/kaly-montesdeoca/Project-planning-assistant/releases/download/0.0.2/project-planning-assistant_0.0.2_x64-setup.exe"
     }
   }
 }
