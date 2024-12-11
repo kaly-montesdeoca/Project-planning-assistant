@@ -16,8 +16,10 @@
     "fs:allow-remove",
     "fs:allow-exists",
     "sql:default",
-    "sql:allow-execute"
-
+    "sql:allow-execute",
+    "log:default",
+    "updater:default",
+    "updater:allow-check",
+    "updater:allow-download-and-install"
   ]
 }
-

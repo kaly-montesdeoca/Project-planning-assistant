@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import Helper from '../Helpers/Helper';
-import { LevelData, Project, NoteData, ParentChildIndex, NotifType } from './item.model';
+import { LevelData, NoteData, ParentChildIndex, NotifType } from './item.model';
 import { useMainStore } from './mainStore';
 import SqlHelper from '../Helpers/SqlHelper';
 

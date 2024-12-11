@@ -1,0 +1,11 @@
+{
+  "version": "v0.0.1",
+  "notes": "Your Release Notes go here",
+  "pub_date": "2024-12-11T11:25:57Z",
+  "platforms": {
+    "windows-x86_64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVTcHNURU1MQm5raU5rVWFab1FxLzNBQ24rUDF5VWkwQzJBb1FVRk5YTGdYVGNZVjZLN1FOTkk3aTAyWmdaZ3o2U1F6d0tkQ2ZxdmROcUxhTGhGZFR2SlBBQ1o2VWNwSmdVPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzMzOTI3NTM4CWZpbGU6cHJvamVjdC1wbGFubmluZy1hc3Npc3RhbnRfMC4xLjBfeDY0X2VuLVVTLm1zaQptWmxRbWtaZ2lSdDV5NG5iSzZPOWsvQUF5QUxoT25OYXdRTDExSk5URW9FZkpJaUQ1VllJTkY2QzRCaVV2bjFMM01XRnhKc1F5N3VuMHJ0ajl0cE1Bdz09Cg==",
+      "url": "https://github.com/kaly-montesdeoca/Project-planning-assistant/releases/download/0.0.1/app-x64-setup.nsis.zip"
+    }
+  }
+}

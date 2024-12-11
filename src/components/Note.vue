@@ -23,7 +23,7 @@
                 <v-slide-group class="pa-4" selected-class="bg-success" show-arrows>
                     <v-slide-group-item v-for="(img, n) in dirImageList" :key="n">                    
                         <v-img :width="162" aspect-ratio="1/1" class="ma-2"
-                            src="https://cdn.vuetifyjs.com/images/parallax/material.jpg" />
+                            :src="img" />
                         <!--<img src="image.jpeg">-->
                     </v-slide-group-item>
                 </v-slide-group>
@@ -60,7 +60,7 @@ import { Annotation } from '../store/item.model';
         noteName: String,
         noteId: {type:Number, required: true},
         annotationList: {type: Object as PropType<Annotation[]>,   default: function () { return [] }, required: true},
-        dirImageList: {type: Array,   default: function () { return [] }, required: false},
+        dirImageList: {type: Object as PropType<string[]>,   default: function () { return [] }, required: false},
     });
 
     const lvlStore = useLevelStore();

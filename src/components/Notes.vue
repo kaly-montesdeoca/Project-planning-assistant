@@ -19,19 +19,19 @@
 
     const { displayedLevel } = storeToRefs(lvlStore)  
     const flickingComp = ref();
-    let isMooving = false;
+    //let isMooving = false;
 
     function indexChanged() {
         lvlStore.changeDisplaySliderIndex(flickingComp.value.index);        
     }
 
     function startMoving() {
-        isMooving = true;        
+        //isMooving = true;        
         flickingComp.value.disableInput();
     }
 
     function stopMooving() {
-        isMooving = false;
+        //isMooving = false;
         flickingComp.value.enableInput();
     }
 

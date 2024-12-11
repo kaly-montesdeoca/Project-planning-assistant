@@ -122,7 +122,8 @@
     }
 
     async function deleteProject (project:Project){
-        
+        const p = project;
+        console.log(p.name);
         /*const directoryName = Helper.GetProyectDirectory(project.name); //Helper.GetStringWithoutSpaces(project.name);      
         await remove(directoryName, { baseDir: BaseDirectory.AppLocalData, recursive: true,});
         let tokenExists = await exists(directoryName, { baseDir: BaseDirectory.AppLocalData });

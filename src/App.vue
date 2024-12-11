@@ -20,7 +20,9 @@
             <action-bar @oMenu="openMenuDialog()" @oNewNote="openNewNoteDialog()" @oSearch="openSearchDialog()"/>
             <menu-dialog ref="menuDialog" />
             <new-note-dialog ref="newNOteDialog" />
-            <SearchDialog ref="SearchDialogRef" />
+            <SearchDialog ref="SearchDialogRef" />                         
+            <NotifyAsk ref="ask" @oClick="respond"></NotifyAsk>  
+            <v-btn @Click="preguntar()">a</v-btn>          
         </div> 
 
     </v-container> 
@@ -30,20 +32,54 @@
     import { useMainStore } from './store/mainStore'; 
     import { useLevelStore } from './store/loadedLvl';
     import SqlHelper from './Helpers/SqlHelper';
-    import { FileNeedSave,  Project } from './store/item.model';
+    import {  NotifType, Project } from './store/item.model';
+    import { warn, debug, trace, info, error } from '@tauri-apps/plugin-log';
     import ActionBar from "./components/ActionBar.vue";
     import MenuDialog from "./components/MenuDialog.vue";
     import ParentCard from './components/ParentCard.vue';
     import NewNoteDialog from './components/NewNoteDialog.vue';
     import Notes from "./components/Notes.vue";   
     import SearchDialog from './components/SearchDialog.vue';
-
+    import { check } from '@tauri-apps/plugin-updater';
     const lvlStore = useLevelStore();
     const mainStore = useMainStore();
     const menuDialog = ref();
     const newNOteDialog = ref();
     const SearchDialogRef = ref();
+    const ask = ref();
 
+    import NotifyAsk from './components/NotifyAsk.vue';
+    import { invoke } from '@tauri-apps/api/core';
+
+    async function preguntar() {
+        ask.value.open('Atención', 'Actualizacion disponible', { color: 'green', width: 500, zIndex: 200 }).then((ask:boolean) => {
+          if (ask) {
+            console.log(ask);
+          }
+        })
+    }    
+
+    function respond(value:boolean) {
+        console.log(value);
+    }
+    async function checkForAppUpdates() {
+        const update = await check();
+        let accept = false;
+        if (update === null) {
+            mainStore.notify("Error al buscar actualizacion.", NotifType.error);
+            return;
+        } else if (update?.available) {
+            ask.value.open('Atención', 'Actualizacion disponible', { color: 'green', width: 500, zIndex: 200 }).then((ask:boolean) => {
+                if (ask) {
+                    accept = true;                    
+                }
+             })
+             await update.downloadAndInstall();
+            await invoke("graceful_restart");
+        } else {
+            mainStore.notify("Sistema actualizado", NotifType.info);
+        }
+    };
     function openMenuDialog() {
         menuDialog.value.open();
     };
@@ -58,29 +94,6 @@
 
     function projecLoaded() {
         return Object.keys(lvlStore.displayedLevel).length !== 0;
-    }
-
-    //Guardado y guardado automatico
-    //La creacion de un nuevo nivel se guarda al momento
-    //1 - Crear nota                          -> 
-    //2 - Editar nota (add/remove annot )     ->    
-    //3 - editar Annotation                   -> 
-    function saveProyect() {
-        for (let i = 0; i < mainStore.filesNeedSave.length; i++){
-            if (mainStore.filesNeedSave[i].needSave) {
-                mainStore.filesNeedSave[i].needSave = false;
-                saveFile(mainStore.filesNeedSave[i]);
-            }
-        }
-    }
-
-    function saveFile(fileToSave:FileNeedSave) {
-        let fileData;
-        if (fileToSave.prefix === 'level'){
-            fileData = lvlStore.allLvls[fileToSave.fileNumber]
-        } else if (fileToSave.prefix === 'annot') {
-            //fileData = lvlStore.
-        }
     }
 
     async function loadProjects() {
@@ -99,9 +112,25 @@
             mainStore.saveProjectMetadataArray(myProjects); 
         }
     }
+    function forwardConsole(
+        fnName: 'log' | 'debug' | 'info' | 'warn' | 'error',
+        logger: (message: string) => Promise<void>
+        ) {
+        const original = console[fnName];
+        console[fnName] = (message) => {
+            original(message);
+            logger(message);
+        };
+    }
     
     onMounted(() => {
         loadProjects();
+        checkForAppUpdates();
+       /* forwardConsole('log', trace);
+        forwardConsole('debug', debug);
+        forwardConsole('info', info);
+        forwardConsole('warn', warn);
+        forwardConsole('error', error);*/
     })
 
 </script>

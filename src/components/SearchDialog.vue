@@ -33,6 +33,7 @@
     }
 
     function goToNote(click:PointerEvent, row:any) {
+        console.log(click);
        const iOnLevel = (lvlStore.getLevelByID(row.item.lvlID));
        const iOnIndex = (lvlStore.getSliderIndexByIDandLvl(row.item.id, iOnLevel));
 
