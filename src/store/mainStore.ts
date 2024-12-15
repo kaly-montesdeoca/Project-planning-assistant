@@ -8,6 +8,8 @@ interface State {
     actualConfigProject: Project;
     projects: Project[];
     filesNeedSave: FileNeedSave[];
+    loader: boolean;
+
   }
 
 export const useMainStore = defineStore('main', {
@@ -17,7 +19,8 @@ export const useMainStore = defineStore('main', {
             ldProjectsBaseDir: '',            
             projects: [] as Project[],
             actualConfigProject: {} as Project,
-            filesNeedSave: []as FileNeedSave[],     
+            filesNeedSave: []as FileNeedSave[],   
+            loader: false,  
         }
       },      
       actions: {       
@@ -25,11 +28,18 @@ export const useMainStore = defineStore('main', {
         notify(msg:string, tipe:NotifType) {
           toast(msg, {
             autoClose: 5500,
-            position: toast.POSITION.BOTTOM_RIGHT,
+            position: toast.POSITION.TOP_RIGHT,
             type: tipe,
           } as ToastOptions);
         },
 
+        showLoader() {
+          this.loader = true;
+        },
+
+        hideLoader() {
+          this.loader = false;
+        },
 
         saveProjectMetadataArray(proyects:Project[]) {
           this.projects = proyects;

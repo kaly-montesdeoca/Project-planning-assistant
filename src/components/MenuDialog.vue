@@ -1,5 +1,5 @@
 <template>    
-    <v-dialog v-model="isOpenDialogMenu">
+    <v-dialog v-model="isOpenDialogMenu" z-index="100">
         <div class="bg-white">
             <h2 class="text-center">Proyectos</h2>
             <v-divider />        
@@ -33,7 +33,7 @@
             <v-dialog v-model="isOpenDialogNew">                
                 <v-card class="mx-auto" max-width="320" title="Nuevo Proyecto" >
                     <template v-slot:text>
-                        <v-text-field v-model="newProjectName" messages="Nombre del proyecto" ></v-text-field>
+                        <v-text-field v-model="newProjectName" label="Nombre del proyecto" :rules="[required, maxAndMin]"></v-text-field>
                     </template>
                     <template v-slot:actions>
                         <v-spacer></v-spacer>
@@ -43,6 +43,7 @@
                 </v-card>
             </v-dialog>
         </div>
+        <NotifyAsk ref="ask"></NotifyAsk> 
     </v-dialog>
 </template>
 
@@ -53,15 +54,16 @@
     import FilesHelper from '../Helpers/FilesHelper';
     import { Project, NoteData, LevelData, NotifType, Annotation } from '../store/item.model';
     import SqlHelper from '../Helpers/SqlHelper';
-
+    import NotifyAsk from './NotifyAsk.vue';
 
     defineExpose({
         open,
     });
 
+    const ask = ref();
     const mainStore = useMainStore();
     const lvlStore = useLevelStore();
-    let newProjectName = '';
+    let newProjectName = ref('');
     let isOpenDialogNew = ref(false);
     let isOpenDialogMenu = ref(false);
     const header = [{title: 'Nombre', sortable: true, key: 'name'}, 
@@ -72,6 +74,7 @@
     //FUNCIONES
 
     async function loadProject (project:Project){
+        mainStore.showLoader();
         mainStore.actualConfigProject = project
         const allLvls: LevelData[] = []; 
         let allNotes: NoteData[] = [];
@@ -94,45 +97,48 @@
         lvlStore.loadSearchNotes(allNotes);      
         lvlStore.loadProject(allLvls);
         isOpenDialogMenu.value = false;
+        mainStore.hideLoader();
     }
 
     async function newProject() {
-        console.log("Creando nuevo proyecto"); 
-        
-        //Primero creamos el directorio del nuevo proyecto
-        const directory = await FilesHelper.createNewProeyctFolder(newProjectName);
-        if (!directory) { return; }
-
-        const imageDirectory = await FilesHelper.createDirectory(FilesHelper.getStringWithoutSpaces(newProjectName) +'/', 'images');
-        if (!imageDirectory){ return; }
-        //Se crearon todos los ficheros
-        //Crear los registros en la DB
-        const result = await SqlHelper.createNewProject(newProjectName);
-        if (result.lastInsertId === -1) { mainStore.notify("Fallo alta en DB.", NotifType.error);return;}
-
-        const lastID = (result.lastInsertId != undefined) ? result.lastInsertId : -1;
-        const newPro:Project = {id:lastID, name:newProjectName, totalLevels:1, createDate: new Date().toString()};
-        mainStore.projects.push(newPro);
-
-        console.log("Se creo el proyecto correctamente.");
-        mainStore.notify("Se creo el proyecto correctamente.", NotifType.success);
-        
-        isOpenDialogNew.value = false;
-        newProjectName = '';
+        if (required(newProjectName.value) && maxAndMin(newProjectName.value)) {
+            console.log("Creando nuevo proyecto"); 
+            
+            //Primero creamos el directorio del nuevo proyecto
+            const directory = await FilesHelper.createNewProeyctFolder(newProjectName.value);
+            if (!directory) { return; }
+    
+            const imageDirectory = await FilesHelper.createDirectory(FilesHelper.getStringWithoutSpaces(newProjectName.value) +'/', 'images');
+            if (!imageDirectory){ return; }
+            //Se crearon todos los ficheros
+            //Crear los registros en la DB
+            const result = await SqlHelper.createNewProject(newProjectName.value);
+            if (result.lastInsertId === -1) { mainStore.notify("Fallo alta en DB.", NotifType.error);return;}
+    
+            const lastID = (result.lastInsertId != undefined) ? result.lastInsertId : -1;
+            const newPro:Project = {id:lastID, name:newProjectName.value, totalLevels:1, createDate: new Date().toString()};
+            mainStore.projects.push(newPro);
+    
+            console.log("Se creo el proyecto correctamente.");
+            mainStore.notify("Se creo el proyecto correctamente.", NotifType.success);
+            
+            CancelNewProject();
+        }
     }
 
     async function deleteProject (project:Project){
-        const p = project;
-        console.log(p.name);
-        /*const directoryName = Helper.GetProyectDirectory(project.name); //Helper.GetStringWithoutSpaces(project.name);      
-        await remove(directoryName, { baseDir: BaseDirectory.AppLocalData, recursive: true,});
-        let tokenExists = await exists(directoryName, { baseDir: BaseDirectory.AppLocalData });
-        if (tokenExists) {
-            console.error("ERROR! No se pudo eliminar el proyecto.");
-            return false;
-        }
-        //Actualizar store
-        someStore.deleteProjectMetadata(project);*/
+        const result = await ask.value.open('Atención', 'Seguro desea eliminar el proyecto?', { color: 'red', width: 500, zIndex: 200 });
+ 
+        if (result) {
+            const res = await SqlHelper.insertData(SqlHelper.DELETE_PROYECTO_TABLE, [project.id]);
+            if (res.rowsAffected) {
+                //Actualizar store
+                mainStore.deleteProjectMetadata(project);
+                mainStore.notify("Se elimino", NotifType.info);
+            } else {
+                mainStore.notify("Ocurrio un error al intentar eliminar el proyacto", NotifType.error);
+            }
+        } 
     }
 
     //Formularios
@@ -146,7 +152,15 @@
     }
     
     function CancelNewProject() {
-        newProjectName = '';
+        newProjectName.value = '';
         isOpenDialogNew.value = false;
+    }
+
+    function required(v:string) {
+        return (!!v || 'Requerido');
+    }
+
+    function maxAndMin(v:string) {
+        return (v.length >= 3 && v.length <= 30 || 'Entre 3 y 30 caracteres');
     }
 </script>

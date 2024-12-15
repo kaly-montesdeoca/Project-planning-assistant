@@ -1,7 +1,6 @@
 import { createApp } from "vue";
 import App from "./App.vue";
 
-// Vuetify
 import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
@@ -20,8 +19,6 @@ const vuetify = createVuetify({
     icons: {},
   })
 
-// End Vuetify
-
 //pinia
 import { createPinia } from 'pinia'
 const pinia = createPinia()
@@ -29,7 +26,6 @@ const pinia = createPinia()
 createApp(App).use(vuetify).use(PerfectScrollbarPlugin).use(pinia).use(
   Vue3Toasity,
   {
-    autoClose: 3000,
-    // ...
+    autoClose: 3000,  
   } as ToastContainerOptions,
 ).component("Flicking", Flicking).mount("#app");

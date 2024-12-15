@@ -1,8 +1,8 @@
 <template>
-    <v-container class="bg-green h-screen" fluid >
-        <v-row v-if="projecLoaded()" >
+    <v-container class="bg-green pa-0" fluid no-gutters>
+        <v-row v-if="projecLoaded()" no-gutters class="h-screen d-flex">          
             <v-col>
-                <v-row  class="d-flex justify-center bg-green">
+                <v-row  class="d-flex justify-center bg-green ">
                     <parentCard />
                 </v-row>
                 <v-row>
@@ -12,18 +12,17 @@
                 </v-row>
             </v-col>
         </v-row>        
-        <v-row v-else class="h-screen d-flex align-center justify-center">  <!--d-flex align-center justify-center-->
-            <!--<testSliderGroup ></testSliderGroup>-->
+        <v-row v-else class="h-screen d-flex align-center justify-center" no-gutters>            
             <h1>No hay proyecto seleccionado</h1>
         </v-row>
-        <div class="position-absolute bottom-0 right-0 pb-2">
+        <v-row class="position-absolute bottom-0 right-0 mb-2 mr-2">
             <action-bar @oMenu="openMenuDialog()" @oNewNote="openNewNoteDialog()" @oSearch="openSearchDialog()"/>
-            <menu-dialog ref="menuDialog" />
-            <new-note-dialog ref="newNOteDialog" />
-            <SearchDialog ref="SearchDialogRef" />                         
-            <NotifyAsk ref="ask"></NotifyAsk>                    
-        </div> 
-
+        </v-row> 
+        <menu-dialog ref="menuDialog" />
+        <new-note-dialog ref="newNOteDialog" />
+        <SearchDialog ref="SearchDialogRef" />                   
+        <Updater />   
+        <Loader />  
     </v-container> 
 </template>
 <script setup lang="ts">
@@ -31,7 +30,7 @@
     import { useMainStore } from './store/mainStore'; 
     import { useLevelStore } from './store/loadedLvl';
     import SqlHelper from './Helpers/SqlHelper';
-    import {  NotifType, Project } from './store/item.model';
+    import {  Project } from './store/item.model';
     //import { warn, debug, trace, info, error } from '@tauri-apps/plugin-log';
     import ActionBar from "./components/ActionBar.vue";
     import MenuDialog from "./components/MenuDialog.vue";
@@ -39,37 +38,14 @@
     import NewNoteDialog from './components/NewNoteDialog.vue';
     import Notes from "./components/Notes.vue";   
     import SearchDialog from './components/SearchDialog.vue';
-    import { check } from '@tauri-apps/plugin-updater';
+    import Updater from './components/Updater.vue';
+    import Loader from './components/Loader.vue';
+    
     const lvlStore = useLevelStore();
     const mainStore = useMainStore();
     const menuDialog = ref();
     const newNOteDialog = ref();
     const SearchDialogRef = ref();
-    const ask = ref();
-
-    import NotifyAsk from './components/NotifyAsk.vue';
-    import { invoke } from '@tauri-apps/api/core';  
-
-    async function checkForAppUpdates() {
-        const update = await check();
-        let accept = false;
-        if (update === null) {
-            mainStore.notify("Error al buscar actualizacion.", NotifType.error);
-            return;
-        } else if (update?.available) {
-            ask.value.open('Atención', 'Actualizacion disponible', { color: 'green', width: 500, zIndex: 200 }).then((ask:boolean) => {
-                if (ask) {
-                    accept = true;                    
-                }
-             })
-             if(accept) {
-                 await update.downloadAndInstall();
-                await invoke("graceful_restart");
-                         }
-        } else {
-            mainStore.notify("Sistema actualizado", NotifType.info);
-        }
-    };
 
     function openMenuDialog() {
         menuDialog.value.open();
@@ -88,6 +64,7 @@
     }
 
     async function loadProjects() {
+        mainStore.showLoader();
         const projects =  await SqlHelper.readProyectTable();
         const myProjects:Project[] = [];
         projects?.forEach(p => {
@@ -101,27 +78,12 @@
         })
         if (projects !== undefined) {
             mainStore.saveProjectMetadataArray(myProjects); 
-        }
+        }       
+        mainStore.hideLoader();
     }
-    /*function forwardConsole(
-        fnName: 'log' | 'debug' | 'info' | 'warn' | 'error',
-        logger: (message: string) => Promise<void>
-        ) {
-        const original = console[fnName];
-        console[fnName] = (message) => {
-            original(message);
-            logger(message);
-        };
-    }*/
     
     onMounted(() => {
-        loadProjects();
-        checkForAppUpdates();
-       /* forwardConsole('log', trace);
-        forwardConsole('debug', debug);
-        forwardConsole('info', info);
-        forwardConsole('warn', warn);
-        forwardConsole('error', error);*/
+        loadProjects();      
     })
 
 </script>

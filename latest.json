@@ -1,11 +1,11 @@
 {
-  "version": "v0.0.2",
+  "version": "v0.0.3",
   "notes": "Your Release Notes go here",
   "pub_date": "2024-12-11T11:25:57Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVTcHNURU1MQm5raUhNbzkwS2k0TEIxZ1V2cTZVVEJMem5TS0VLRldsL08zZEhsb3Iyd0dpdDFhczN3L3pKR0xiZ2tyajZYa3A1eFdCSzBJU1hzVGo0azFJNGxIWm5XVXdjPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzMzOTQwNzA4CWZpbGU6cHJvamVjdC1wbGFubmluZy1hc3Npc3RhbnRfMC4wLjJfeDY0LXNldHVwLmV4ZQprTUNYOGhGTEtvMjZxNFRLK3FQUzVwbHY5bDJXVmZDR1dBT2RkSGR3QW9tTlc1S0EwVzRXUThteVJKWUlKWHJsYllzZldxVzZrSDA2c0dRZm1RMVhCdz09Cg==",
-      "url": "https://github.com/kaly-montesdeoca/Project-planning-assistant/releases/download/0.0.2/project-planning-assistant_0.0.2_x64-setup.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVTcHNURU1MQm5raVBJVTNVbkVPaWJIeisyMkwxZHB5d1NBSElkOEVCRVRvNGtIbUZZSHRjYzQ5SHRtSXNmRjUzV0pLSXFxUm1RR016UVJVREZDTWZzZjJVRkprVmVtNUFZPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzM0Mjg3MDExCWZpbGU6cHJvamVjdC1wbGFubmluZy1hc3Npc3RhbnRfMC4wLjNfeDY0X2VuLVVTLm1zaQp0WlhwZEh5QVFTbnIzUWgyTXdsTzdMVDJoT1Vucm5uQ3h0bXMrTkVvZnFMTlllTWRNa3dBY05oellOOVBHUGp0aFY1VmYzRDV5MHBIeW5hWnRjb3RBQT09Cg==",
+      "url": "https://github.com/kaly-montesdeoca/Project-planning-assistant/releases/download/0.0.3/project-planning-assistant_0.0.3_x64-setup.exe"
     }
   }
 }

@@ -1,5 +1,5 @@
 <template>  
-    <v-row class="position-absolute top-0 pt-3">    
+    <v-row class="position-absolute top-0 mt-3">    
         <v-card width="550" class="pt-2">
             <template v-slot:text>
                 <v-row>

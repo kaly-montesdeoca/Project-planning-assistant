@@ -1,13 +1,11 @@
-<template> 
-<div class="">   
+<template>  
     <v-row class="mt-16">
         <v-col>    
             <flicking :options="{ align: 'center', circular: true, moveType: 'freeScroll', interruptable: false, duration: 100, preventClickOnDrag: true }" @changed="indexChanged" ref="flickingComp" @moveEnd="stopMooving">            
                 <note v-for="(note, n) in displayedLevel.noteList" :note-id="note.id" :note-name="note.name" :annotationList="note.annotationList" :key="n"/>           
             </flicking> 
         </v-col>
-    </v-row>    
-</div>
+    </v-row>
 </template>
 <script setup lang="ts">  
     import Note from "./Note.vue";
@@ -19,19 +17,16 @@
 
     const { displayedLevel } = storeToRefs(lvlStore)  
     const flickingComp = ref();
-    //let isMooving = false;
 
     function indexChanged() {
         lvlStore.changeDisplaySliderIndex(flickingComp.value.index);        
     }
 
-    function startMoving() {
-        //isMooving = true;        
+    function startMoving() {               
         flickingComp.value.disableInput();
     }
 
-    function stopMooving() {
-        //isMooving = false;
+    function stopMooving() {       
         flickingComp.value.enableInput();
     }
 

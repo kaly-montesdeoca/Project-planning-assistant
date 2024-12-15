@@ -1,6 +1,6 @@
 
 <template>
-    <v-dialog v-model="dialog" :max-width="options.width" :style="{ zIndex: options.zIndex }" @keydown.esc="cancel">
+    <v-dialog v-model="dialog" :max-width="options.width" :style="{ zIndex: options.zIndex }" @keydown.esc="cancel" z-index="500">
       <v-card>
         <v-toolbar dark :color="options.color" dense flat>
           <v-toolbar-title class="white--text">
