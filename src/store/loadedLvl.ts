@@ -48,11 +48,18 @@ interface State {
         const newLevel:LevelData = {id: result.lastInsertId, levelNumber:newLvlnumber, noteList:newLvlNotes} as LevelData;
         this.allLvls.push(newLevel);
 
-        //this.displayedLevel.levelNumber =+ 1;
         if (newLvlnumber >= 2) {
           this.addNewSliderIndex(this.allLvls[this.allLvls.length-1].noteList, this.allLvls.length-3);
         }
         return true;
+      },
+
+      async editNote(newNoteName:string, noteId:number):Promise<boolean> {     
+        console.log("newNoteName: " + newNoteName + ' noteId: ' + noteId);
+        const result = await SqlHelper.insertData(SqlHelper.UPDATE_NOTE_TABLE, [newNoteName, noteId]);
+        if (result.rowsAffected) { return true }
+        
+        return false; 
       },
 
       async addNewNote(newNoteName:string) {
@@ -67,6 +74,35 @@ interface State {
             this.createChild(newID, thisLvl, 'From: '+newNoteName);
           }
         }
+
+      },
+
+      async deleteNote(noteToDelete:NoteData) {
+        const thisLevel = Helper.SearchLvlNumberByID(noteToDelete.lvlID, this.allLvls);
+        if (thisLevel !== this.allLvls.length-1) {
+          //tiene hijo/s
+          const childList = Helper.getAllChilds(noteToDelete.id, this.allLvls[thisLevel+1].noteList);
+          childList.forEach( n => {
+            this.deleteNote(n);
+          })
+        }
+
+        //Eliminar de la DB
+        const result = await SqlHelper.insertData(SqlHelper.DELETE_NOTE_TABLE, [noteToDelete.id])
+        if (!result.rowsAffected) {
+          useMainStore().notify("Error al eliminar nota.", NotifType.error);
+        } else {
+          //Actualizar el elider
+          if (thisLevel-2 >= 0) {
+            this.updateSliderIndexDelete(noteToDelete.parentId, this.parentSliderIndexArr[thisLevel-2]);
+          }  
+          //Eliminar del store          
+          const index = Helper.getIndexNote(noteToDelete.id, this.allLvls[thisLevel].noteList);
+          this.allLvls[thisLevel].noteList.splice(index, 1);
+        }
+      },
+
+      async deleteChild() {
 
       },
 
@@ -94,11 +130,24 @@ interface State {
         return (newID === undefined) ? -1 : newID;
       },
 
-
+      updateSliderIndexDelete(parentId:number, sliderIndex:ParentChildIndex[]) {
+        const sliderArrayIndex = Helper.SearchIndexByParentId(parentId, sliderIndex);
+        if (sliderIndex[sliderArrayIndex].childIndexInf === sliderIndex[sliderArrayIndex].childIndexSup) {
+          //Solo hay un elemento, entoces hay que eliminar el registro
+        } else {
+          sliderIndex[sliderArrayIndex].childIndexSup -= 1; 
+        }
+        //Ahora toca acomodar todos los indices a partir de sliderArrayIndex+1
+        //los indices anteiores no se tocan
+        for (let i = sliderArrayIndex+1; i < sliderIndex.length; i++) {
+          sliderIndex[i].childIndexInf -=1;
+          sliderIndex[i].childIndexSup -=1;
+        }
+      },
 
       updateSliderIndex(parentId:number, sliderIndex:ParentChildIndex[]):number {
         //Primero necesito la posicion en el arreglo de IndexSlider
-        // de la zona donde se inserta la nota (zona: cada padre tiene una zona, es 
+        //de la zona donde se inserta la nota (zona: cada padre tiene una zona, es 
         //donde estan las hijas)
         //sliderIndex es el arreglo de indices correspondiente al nivel de la nota
         const sliderArrayIndex = Helper.SearchIndexByParentId(parentId, sliderIndex);
@@ -109,8 +158,8 @@ interface State {
         //Ahora toca acomodar todos los indices a partir de sliderArrayIndex+1
         //los indices anteiores no se tocan
         for (let i = sliderArrayIndex+1; i < sliderIndex.length; i++) {
-          sliderIndex[i].childIndexInf +1;
-          sliderIndex[i].childIndexSup +1;
+          sliderIndex[i].childIndexInf +=1;
+          sliderIndex[i].childIndexSup +=1;
         }
 
         return indexOfNewElement;
@@ -295,7 +344,7 @@ interface State {
         return 0;
       },
 
-      getParentName (idParent:number):string {
+      /*getParentName (idParent:number):string {
         for (let i = 0; i < this.allLvls.length; i++){
           for (let j = 0; j < this.allLvls[i].noteList.length; j++) {
             if (this.allLvls[i].noteList[j].id === idParent) {
@@ -304,9 +353,9 @@ interface State {
           }
         }
         return 'ERROR!';
-      },
+      },*/
 
-      getParentNameWithLvl (lvl:number, idParent:number):string {
+      /*getParentNameWithLvl (lvl:number, idParent:number):string {
         for (let i=0; i < this.allLvls[lvl].noteList.length; i++){
           if (this.allLvls[lvl].noteList[i].id === idParent) {
             return this.allLvls[lvl].noteList[i].name;
@@ -314,7 +363,7 @@ interface State {
         }
         useMainStore().notify("Error al obtener nombre.", NotifType.error)
         return 'ERROR! (154)';
+        },*/
       },
-    },
     getters: {},
   })

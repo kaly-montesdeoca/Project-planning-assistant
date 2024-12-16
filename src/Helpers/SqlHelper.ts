@@ -126,6 +126,8 @@ export default class SqlHelper {
     static INSERT_ANNOTTATION_TABLE = "INSERT INTO Annotation (note_id, data) VALUES ($1, $2)";
     
     static UPDATE_ANNOTATION_TABLE = "UPDATE Annotation SET data = $1 WHERE id = $2";
+    static UPDATE_NOTE_TABLE = "UPDATE Note SET name = $1 WHERE id = $2";
 
     static DELETE_PROYECTO_TABLE = "UPDATE Proyecto SET deleted = 1 WHERE id = $1";
+    static DELETE_NOTE_TABLE  = "UPDATE Note SET deleted = 1 WHERE id = $1";
 }

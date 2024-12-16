@@ -19,19 +19,21 @@
             <action-bar @oMenu="openMenuDialog()" @oNewNote="openNewNoteDialog()" @oSearch="openSearchDialog()"/>
         </v-row> 
         <menu-dialog ref="menuDialog" />
-        <new-note-dialog ref="newNOteDialog" />
+        <new-note-dialog />
         <SearchDialog ref="SearchDialogRef" />                   
         <Updater />   
         <Loader />  
     </v-container> 
 </template>
+
 <script setup lang="ts">
     import { ref, onMounted } from 'vue'
+    import { getVersion } from '@tauri-apps/api/app';
     import { useMainStore } from './store/mainStore'; 
     import { useLevelStore } from './store/loadedLvl';
+    import { useComunicationStore } from './store/comunication';    
     import SqlHelper from './Helpers/SqlHelper';
     import {  Project } from './store/item.model';
-    //import { warn, debug, trace, info, error } from '@tauri-apps/plugin-log';
     import ActionBar from "./components/ActionBar.vue";
     import MenuDialog from "./components/MenuDialog.vue";
     import ParentCard from './components/ParentCard.vue';
@@ -43,16 +45,16 @@
     
     const lvlStore = useLevelStore();
     const mainStore = useMainStore();
+    const comunicationStore = useComunicationStore();
     const menuDialog = ref();
-    const newNOteDialog = ref();
     const SearchDialogRef = ref();
-
+    let version = '';
     function openMenuDialog() {
         menuDialog.value.open();
     };
 
     function openNewNoteDialog() {
-        newNOteDialog.value.open();
+        comunicationStore.openNewNoteDialog();
     }
 
     function openSearchDialog() {
@@ -80,6 +82,7 @@
             mainStore.saveProjectMetadataArray(myProjects); 
         }       
         mainStore.hideLoader();
+        version = await getVersion();
     }
     
     onMounted(() => {
@@ -87,3 +90,9 @@
     })
 
 </script>
+
+<style>
+::-webkit-scrollbar {
+display: none;
+}
+</style>

@@ -1,6 +1,6 @@
 <template>  
     <v-row class="position-absolute top-0 mt-3">    
-        <v-card width="550" class="pt-2">
+        <v-card width="690" class="pt-2">
             <template v-slot:text>
                 <v-row>
                     <h2>{{ `Nivel actual: ${lvlStore.displayedLevel.levelNumber}` }}</h2>  
@@ -21,8 +21,7 @@
                         </template>               
                     </v-tooltip>  
                     <v-spacer></v-spacer>
-                    <v-divider vertical></v-divider>    
-                    <v-spacer></v-spacer>
+                    <v-divider vertical></v-divider>  
                     <h2>{{ lvlStore.displayesParentName }}</h2>  
                     <v-spacer></v-spacer>
                     <v-tooltip text="Ir al anterior">
@@ -66,7 +65,7 @@
     }
 
     function brotherExist() {
-        if (lvlStore.displayedLevel.levelNumber === 0 || lvlStore.displayedLevel.levelNumber === 1) {
+        if (lvlStore.displayedLevel.levelNumber === 0 || lvlStore.displayedLevel.levelNumber === 1 || lvlStore.allLvls[lvlStore.displayedLevel.levelNumber-1].noteList.length === 1) {
             return true;
         }
         if (lvlStore.allLvls[lvlStore.displayedLevel.levelNumber -1].noteList.length > 1) {

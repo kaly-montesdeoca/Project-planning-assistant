@@ -1,4 +1,4 @@
-import { ParentChildIndex } from "../store/item.model";
+import { LevelData, ParentChildIndex, NoteData } from "../store/item.model";
 
 export default class Helper {  
 
@@ -49,6 +49,35 @@ export default class Helper {
             }
         }
         console.error("ERROR! No encontro ParentId: " + value);
+        return 0;
+    }
+
+    static getAllChilds(parentId:number, noteList:NoteData[]):NoteData[] {
+        let aux = [] as NoteData[];
+        for (let i = 0; i < noteList.length; i++) {
+            if (noteList[i].parentId === parentId) {
+                aux.push(noteList[i]);
+            }
+        }
+        return aux;
+    }
+
+    static getIndexNote(id:number, noteList:NoteData[]):number { 
+        for (let i = 0; i < noteList.length; i++) {
+            if (noteList[i].id === id) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    static SearchLvlNumberByID(id:number, list:LevelData[]) {
+        for (let i = 0; i < list.length; i++){
+            if (list[i].id === id) {
+                return i;
+            }
+        }
+        console.error("ERROR! No encontro ParentId: " + id);
         return 0;
     }
 

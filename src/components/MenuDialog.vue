@@ -1,5 +1,5 @@
 <template>    
-    <v-dialog v-model="isOpenDialogMenu" z-index="100">
+    <v-dialog v-model="isOpenDialogMenu" z-index="100" min-width="500" max-width="800">
         <div class="bg-white">
             <h2 class="text-center">Proyectos</h2>
             <v-divider />        

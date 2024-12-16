@@ -1,8 +1,9 @@
 <template>  
     <v-row class="mt-16">
         <v-col>    
-            <flicking :options="{ align: 'center', circular: true, moveType: 'freeScroll', interruptable: false, duration: 100, preventClickOnDrag: true }" @changed="indexChanged" ref="flickingComp" @moveEnd="stopMooving">            
-                <note v-for="(note, n) in displayedLevel.noteList" :note-id="note.id" :note-name="note.name" :annotationList="note.annotationList" :key="n"/>           
+            <flicking :options="{ align: 'center', circular: true, moveType: 'freeScroll', interruptable: false, duration: 500, preventClickOnDrag: true }"
+            @changed="indexChanged" ref="flickingComp" @moveEnd="stopMooving">            
+                <note v-for="(note, n) in displayedLevel.noteList" :thisNote="note" :key="n"/>           
             </flicking> 
         </v-col>
     </v-row>
@@ -22,19 +23,21 @@
         lvlStore.changeDisplaySliderIndex(flickingComp.value.index);        
     }
 
-    function startMoving() {               
-        flickingComp.value.disableInput();
+    function startMoving() { 
+        if (flickingComp.value.circularEnabled) {
+            flickingComp.value.disableInput();
+        }
     }
 
-    function stopMooving() {       
+    function stopMooving() {  
         flickingComp.value.enableInput();
     }
 
     watch(
     () => lvlStore.sliderIndex,
     () => {       
-        flickingComp.value.moveTo(lvlStore.sliderIndex);
         startMoving();
+        flickingComp.value.moveTo(lvlStore.sliderIndex);
     }
 )
 </script>

@@ -56,7 +56,7 @@
     };
 
     onMounted(() => {
-        checkForAppUpdates();
+        //checkForAppUpdates();
     });
 
 </script>

@@ -30,12 +30,6 @@ export interface Project {
     createDate: string;    
 }
 
-/*//Para levantar el listado de 'tareas'
-export interface FileStringList {
-    ownerId: number;
-    stringList: string[];
-}*/
-
 //relacion entre padre e indice del slider
 export interface ParentChildIndex {
     parentId: number;
@@ -48,9 +42,7 @@ export interface FileNeedSave {
     fileNumber: number;
     needSave: boolean;
 }
-/*export interface ParentChildIndexArray {
-    parentChildIndexArr: ParentChildIndex[];
-}*/
+
 export const DBName = "projectsDB.db";
 
 export enum NotifType {
