@@ -1,11 +1,11 @@
 {
-  "version": "v0.0.4",
+  "version": "v0.0.5",
   "notes": "Your Release Notes go here",
   "pub_date": "2024-12-11T11:25:57Z",
   "platforms": {
     "windows-x86_64": {
       "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVTcHNURU1MQm5raVBJVTNVbkVPaWJIeisyMkwxZHB5d1NBSElkOEVCRVRvNGtIbUZZSHRjYzQ5SHRtSXNmRjUzV0pLSXFxUm1RR016UVJVREZDTWZzZjJVRkprVmVtNUFZPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzM0Mjg3MDExCWZpbGU6cHJvamVjdC1wbGFubmluZy1hc3Npc3RhbnRfMC4wLjNfeDY0X2VuLVVTLm1zaQp0WlhwZEh5QVFTbnIzUWgyTXdsTzdMVDJoT1Vucm5uQ3h0bXMrTkVvZnFMTlllTWRNa3dBY05oellOOVBHUGp0aFY1VmYzRDV5MHBIeW5hWnRjb3RBQT09Cg==",
-      "url": "https://github.com/kaly-montesdeoca/Project-planning-assistant/releases/download/0.0.4/project-planning-assistant_0.0.4_x64-setup.exe"
+      "url": "https://github.com/kaly-montesdeoca/Project-planning-assistant/releases/download/0.0.5/project-planning-assistant_0.0.5_x64-setup.exe"
     }
   }
 }
