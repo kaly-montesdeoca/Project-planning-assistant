@@ -1,9 +1,9 @@
 <template>
     <v-container class="bg-green pa-0" fluid no-gutters>
-        <v-row v-if="projecLoaded()" no-gutters class="h-screen d-flex">          
-            <v-col>
+        <v-row no-gutters class="h-screen d-flex">
+            <v-col v-if="projecLoaded()">
                 <v-row  class="d-flex justify-center bg-green ">
-                    <parentCard />
+                        <parentCard />
                 </v-row>
                 <v-row>
                     <v-col>
@@ -11,9 +11,14 @@
                     </v-col>
                 </v-row>
             </v-col>
-        </v-row>        
-        <v-row v-else class="h-screen d-flex align-center justify-center" no-gutters>            
-            <h1>No hay proyecto seleccionado</h1>
+            <v-col v-else>
+                <v-row class="h-screen align-center justify-center">
+                    <h1>No hay proyecto seleccionado</h1>
+                </v-row>           
+                <v-row no-gutters>           
+                    <h5>V {{version}}</h5> 
+                </v-row>  
+            </v-col>
         </v-row>
         <v-row class="position-absolute bottom-0 right-0 mb-2 mr-2">
             <action-bar @oMenu="openMenuDialog()" @oNewNote="openNewNoteDialog()" @oSearch="openSearchDialog()"/>
