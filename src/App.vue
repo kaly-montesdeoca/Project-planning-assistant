@@ -53,7 +53,7 @@
     const comunicationStore = useComunicationStore();
     const menuDialog = ref();
     const SearchDialogRef = ref();
-    let version = '';
+    let version = ref('');
     function openMenuDialog() {
         menuDialog.value.open();
     };
@@ -87,7 +87,7 @@
             mainStore.saveProjectMetadataArray(myProjects); 
         }       
         mainStore.hideLoader();
-        version = await getVersion();
+        version.value = await getVersion();
     }
     
     onMounted(() => {
