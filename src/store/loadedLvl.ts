@@ -55,7 +55,6 @@ interface State {
       },
 
       async editNote(newNoteName:string, noteId:number):Promise<boolean> {     
-        console.log("newNoteName: " + newNoteName + ' noteId: ' + noteId);
         const result = await SqlHelper.insertData(SqlHelper.UPDATE_NOTE_TABLE, [newNoteName, noteId]);
         if (result.rowsAffected) { return true }
         

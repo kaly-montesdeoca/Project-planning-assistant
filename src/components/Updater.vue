@@ -38,15 +38,15 @@
                     switch (event.event) {
                         case 'Started':
                             contentLength = (event.data.contentLength !== undefined) ? event.data.contentLength : 0 ;
-                            //console.log(`started downloading ${event.data.contentLength} bytes`);
+                            console.log(`started downloading ${event.data.contentLength} bytes`);
                             break;
                         case 'Progress':
                             downloaded += event.data.chunkLength;
                             value = (downloaded *100) / contentLength;
-                            //console.log(`downloaded ${downloaded} from ${contentLength}`);
+                            console.log(`downloaded ${downloaded} from ${contentLength}`);
                             break;
                         case 'Finished':
-                            //console.log('download finished');
+                            console.log('download finished');
                             break;
                     }
                 });

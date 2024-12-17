@@ -1,13 +1,14 @@
 import Database, { QueryResult } from '@tauri-apps/plugin-sql';
-import { DBName, LevelData, Project, NoteData, Annotation } from '../store/item.model';
+import { DBName, LevelData, Project, NoteData, Annotation, DirImg } from '../store/item.model';
+import { join, appLocalDataDir } from '@tauri-apps/api/path';
+import { convertFileSrc } from '@tauri-apps/api/core';
+import { useMainStore } from '../store/mainStore';
 
-export default class SqlHelper {
-
-    static sqliteDirectory ="sqlite:C:/Users/Kaly/AppData/Local/com.ppa.app/ProjectsFiles/";
+export default class SqlHelper { 
 
     static async createNewProject(name:string) {
         try {
-            const db = await Database.load(this.sqliteDirectory + DBName);
+            const db = await Database.load(useMainStore().sqlDirectory + DBName);
 
             const result = await db.execute("INSERT into Proyecto (nombre, created_at) VALUES ($1, $2)", [name, new Date()]);
             const result2 = await db.execute(this.INSERT_NIVEL_TABLE, [0, result.lastInsertId]);
@@ -27,7 +28,7 @@ export default class SqlHelper {
 
     static async insertData(query:string, data:any) {
         try {
-            const db = await Database.load(this.sqliteDirectory + DBName);
+            const db = await Database.load(useMainStore().sqlDirectory + DBName);
             const result = await db.execute(query, data);
             db.close();
             return result;
@@ -39,7 +40,7 @@ export default class SqlHelper {
 
     static async readProyectTable() {
         try {            
-            const db = await Database.load(this.sqliteDirectory + DBName);
+            const db = await Database.load(useMainStore().sqlDirectory + DBName);
             const result:Project[] = await db.select(this.READ_PROYECTO_TABLE);
 
             db.close();
@@ -51,7 +52,7 @@ export default class SqlHelper {
 
     static async readLevelTable(projectId:number) {
         try {
-            const db = await Database.load(this.sqliteDirectory + DBName);
+            const db = await Database.load(useMainStore().sqlDirectory + DBName);
             const result:LevelData[] = await db.select("SELECT id, numero as levelNumber FROM Nivel WHERE proyecto_id = $1;", [projectId]);
 
             db.close();
@@ -64,7 +65,7 @@ export default class SqlHelper {
 
     static async readNoteTable(lvlId:number) {
         try {
-            const db = await Database.load(this.sqliteDirectory + DBName);
+            const db = await Database.load(useMainStore().sqlDirectory + DBName);
             const result:NoteData[] = await db.select(this.READ_NOTE_TABLE, [lvlId]);
 
             db.close();
@@ -77,7 +78,7 @@ export default class SqlHelper {
 
     static async readAnnotationTable(noteId:number) {
         try {
-            const db = await Database.load(this.sqliteDirectory + DBName);
+            const db = await Database.load(useMainStore().sqlDirectory + DBName);
             const result:Annotation[] = await db.select(this.READ_ANNOTATION_TABLE, [noteId]);
 
             db.close();
@@ -87,17 +88,24 @@ export default class SqlHelper {
 
     static async readImgsTable(noteId:number) {
         try {
-            const db = await Database.load(this.sqliteDirectory + DBName);
-            const result:string[] = await db.select(this.READ_IMAGES_TABLE, [noteId]);
+            const db = await Database.load(useMainStore().sqlDirectory + DBName);
+            const result:DirImg[] = await db.select(this.READ_IMAGES_TABLE, [noteId]);
 
             db.close();
-            return result;
+            let resultAux = [] as string[];         
+            const appDataDirPath = await appLocalDataDir() + this.getProyectDirectory(useMainStore().actualConfigProject.name) + '/images';
+            for (let i = 0; i < result.length; i++){
+                const filePath = await join(appDataDirPath, result[i].dir);
+                const assetUrl = convertFileSrc(filePath);   
+                resultAux.push(assetUrl)
+            }
+            return resultAux;
         } catch (e) { console.log(e); return [] }
     }
 
     static async createDBTables() {
         try {
-            const db = await Database.load(this.sqliteDirectory + DBName);
+            const db = await Database.load(useMainStore().sqlDirectory + DBName);
             await db.execute(this.CREATE_PROYECTO_TABLE);
             await db.execute(this.CREATE_NIVEL_TABLE);
             await db.execute(this.CREATE_NOTE_TABLE);
@@ -108,6 +116,19 @@ export default class SqlHelper {
         }catch (e) {
             console.log(e);
         }
+    }
+
+    static getProyectDirectory(projectName:String):string {
+        return useMainStore().baseDirectory + this.getStringWithoutSpaces(projectName);
+    }
+
+    static getStringWithoutSpaces(str:String):string {
+        const arr = str.split(' ');
+        let result = '';
+        arr.forEach(element => {
+            result += element;
+        });
+        return result;
     }
     
     static CREATE_PROYECTO_TABLE = 'CREATE TABLE "Proyecto" ( "id"	INTEGER NOT NULL UNIQUE, "nombre" TEXT NOT NULL, "niveles_count"	INTEGER NOT NULL DEFAULT 1, "created_at"	INTEGER, PRIMARY KEY("id" AUTOINCREMENT))';
@@ -124,6 +145,7 @@ export default class SqlHelper {
     static INSERT_NIVEL_TABLE = "INSERT INTO Nivel (numero, proyecto_id) VALUES ($1, $2)";
     static INSERT_NOTE_TABLE = "INSERT INTO Note (parent_id, name, level_id) VALUES ($1, $2, $3)";
     static INSERT_ANNOTTATION_TABLE = "INSERT INTO Annotation (note_id, data) VALUES ($1, $2)";
+    static INSERT_IMAGES_TABLE = "INSERT INTO Images (dir, note_id) VALUES ($1, $2)";
     
     static UPDATE_ANNOTATION_TABLE = "UPDATE Annotation SET data = $1 WHERE id = $2";
     static UPDATE_NOTE_TABLE = "UPDATE Note SET name = $1 WHERE id = $2";

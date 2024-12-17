@@ -15,6 +15,9 @@ export interface Annotation {
     note_id: number;
 }
 
+export interface DirImg {
+    dir: string;
+}
 
 export interface LevelData {
     id: number;

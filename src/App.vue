@@ -1,6 +1,6 @@
 <template>
     <v-container class="bg-green pa-0" fluid no-gutters>
-        <v-row no-gutters class="h-screen d-flex">
+       <v-row no-gutters class="h-screen d-flex">
             <v-col v-if="projecLoaded()">
                 <v-row  class="d-flex justify-center bg-green ">
                         <parentCard />
@@ -28,6 +28,8 @@
         <SearchDialog ref="SearchDialogRef" />                   
         <Updater />   
         <Loader />  
+        <NewLevelSelector />
+        <NewImgDialog />
     </v-container> 
 </template>
 
@@ -47,7 +49,10 @@
     import SearchDialog from './components/SearchDialog.vue';
     import Updater from './components/Updater.vue';
     import Loader from './components/Loader.vue';
-    
+    import NewLevelSelector from './dialogs/NewLevelSelector.vue';
+    import NewImgDialog from './dialogs/NewImgDialog.vue';
+    //import ClipboardImage from './components/ClipboardImage.vue';
+
     const lvlStore = useLevelStore();
     const mainStore = useMainStore();
     const comunicationStore = useComunicationStore();
@@ -72,6 +77,7 @@
 
     async function loadProjects() {
         mainStore.showLoader();
+        await mainStore.cargarSqlDirectory();
         const projects =  await SqlHelper.readProyectTable();
         const myProjects:Project[] = [];
         projects?.forEach(p => {

@@ -1,9 +1,12 @@
 import { defineStore } from 'pinia';
 import {  Project, FileNeedSave, NotifType } from './item.model';
 import { toast, type ToastOptions } from 'vue3-toastify';
+import { appLocalDataDir } from '@tauri-apps/api/path';
 
 interface State {
     appName: string;
+    baseDirectory: string;
+    sqlDirectory: string;
     ldProjectsBaseDir: string | '';    
     actualConfigProject: Project;
     projects: Project[];
@@ -16,6 +19,8 @@ export const useMainStore = defineStore('main', {
     state: (): State => {
         return {
             appName: 'ProjectPlanningAssistant',
+            baseDirectory: '/ProjectsFiles/',
+            sqlDirectory: '',
             ldProjectsBaseDir: '',            
             projects: [] as Project[],
             actualConfigProject: {} as Project,
@@ -23,7 +28,15 @@ export const useMainStore = defineStore('main', {
             loader: false,  
         }
       },      
-      actions: {       
+      actions: {      
+        
+        async cargarSqlDirectory() {
+          this. sqlDirectory = 'sqlite:' + await appLocalDataDir() + this.baseDirectory;
+        },
+
+        async getProyectDirectory() {
+          return await appLocalDataDir() + this.baseDirectory + this.getStringWithoutSpaces(this.actualConfigProject.name) + '/'
+        },
 
         notify(msg:string, tipe:NotifType) {
           toast(msg, {
@@ -52,7 +65,16 @@ export const useMainStore = defineStore('main', {
 
         getDataFromConfigLine(data:String) :string {
           return data.substring(1, data.length-1);          
-        },       
+        },    
+        
+        getStringWithoutSpaces(str:String):string {
+          const arr = str.split(' ');
+          let result = '';
+          arr.forEach(element => {
+              result += element;
+          });
+          return result;
+      }
       },
 
       getters: {

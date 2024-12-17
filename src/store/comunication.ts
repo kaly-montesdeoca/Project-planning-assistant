@@ -6,6 +6,8 @@ interface State {
     noteName: string;
     isNoteNew: boolean;
     note: NoteData;
+    newLevelSelectorDialog: boolean;
+    newImgDialog: boolean;
  }
 
 export const useComunicationStore = defineStore('comunication', {
@@ -15,6 +17,8 @@ export const useComunicationStore = defineStore('comunication', {
         noteName: '',
         isNoteNew: true,
         note: {} as NoteData,
+        newLevelSelectorDialog: false,
+        newImgDialog: false,
       }
     },
 
@@ -37,6 +41,14 @@ export const useComunicationStore = defineStore('comunication', {
             this.note = {} as NoteData;
         },
 
+        openLevelSelectorDialog(note:NoteData) {
+            this.newLevelSelectorDialog = true;
+            this.note = note;
+        },
+
+        openImgDialog() {
+            this.newImgDialog = true;
+        }
     },
 
     getters: {},

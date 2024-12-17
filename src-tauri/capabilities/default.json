@@ -15,11 +15,17 @@
     "fs:allow-write",
     "fs:allow-remove",
     "fs:allow-exists",
+    "fs:allow-copy-file",
     "sql:default",
     "sql:allow-execute",
     "log:default",
     "updater:default",
     "updater:allow-check",
-    "updater:allow-download-and-install"
+    "updater:allow-download-and-install",
+    "clipboard-manager:allow-read-image",
+    "clipboard-manager:allow-read-text",
+    "clipboard-manager:allow-write-image",
+    "clipboard-manager:allow-write-text",
+    "dialog:allow-open"
   ]
 }
