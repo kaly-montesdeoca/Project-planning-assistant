@@ -28,8 +28,7 @@
         <SearchDialog ref="SearchDialogRef" />                   
         <Updater />   
         <Loader />  
-        <NewLevelSelector />
-        <NewImgDialog />
+        <NewLevelSelector />        
     </v-container> 
 </template>
 
@@ -50,7 +49,6 @@
     import Updater from './components/Updater.vue';
     import Loader from './components/Loader.vue';
     import NewLevelSelector from './dialogs/NewLevelSelector.vue';
-    import NewImgDialog from './dialogs/NewImgDialog.vue';
     //import ClipboardImage from './components/ClipboardImage.vue';
 
     const lvlStore = useLevelStore();
